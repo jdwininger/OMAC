@@ -150,3 +150,13 @@ node_modules/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+*.webp
