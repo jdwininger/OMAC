@@ -13,6 +13,7 @@ import tarfile
 import zipfile
 import tempfile
 import shutil
+import platform
 from datetime import datetime
 from typing import List, Dict, Optional
 from PyQt6.QtWidgets import (
@@ -119,25 +120,27 @@ class ActionFigureDialog(QDialog):
         """Load manufacturers from saved file."""
         self.saved_manufacturers = set()
         try:
-            with open("manufacturers.txt", "r", encoding="utf-8") as f:
+            manufacturers_file = os.path.join(self.parent().data_dir, "manufacturers.txt")
+            with open(manufacturers_file, "r", encoding="utf-8") as f:
                 for line in f:
                     manufacturer = line.strip()
                     if manufacturer:
                         self.saved_manufacturers.add(manufacturer)
-        except FileNotFoundError:
-            pass  # File doesn't exist yet, that's okay
+        except (FileNotFoundError, AttributeError):
+            pass  # File doesn't exist yet, or no parent data_dir
     
     def load_locations(self):
         """Load locations from saved file."""
         self.saved_locations = set()
         try:
-            with open("locations.txt", "r", encoding="utf-8") as f:
+            locations_file = os.path.join(self.parent().data_dir, "locations.txt")
+            with open(locations_file, "r", encoding="utf-8") as f:
                 for line in f:
                     location = line.strip()
                     if location:
                         self.saved_locations.add(location)
-        except FileNotFoundError:
-            pass  # File doesn't exist yet, that's okay
+        except (FileNotFoundError, AttributeError):
+            pass  # File doesn't exist yet, or no parent data_dir
     
     def init_ui(self):
         """Initialize the dialog UI."""
@@ -483,9 +486,10 @@ class ActionFigureDialog(QDialog):
                 
                 # Save to a simple text file for persistence
                 try:
-                    with open("manufacturers.txt", "a", encoding="utf-8") as f:
+                    manufacturers_file = os.path.join(self.parent().data_dir, "manufacturers.txt")
+                    with open(manufacturers_file, "a", encoding="utf-8") as f:
                         f.write(f"{manufacturer_name}\n")
-                except Exception:
+                except (Exception, AttributeError):
                     pass  # Fail silently if can't write to file
             else:
                 # Select existing item
@@ -512,9 +516,10 @@ class ActionFigureDialog(QDialog):
                 
                 # Save to a simple text file for persistence
                 try:
-                    with open("locations.txt", "a", encoding="utf-8") as f:
+                    locations_file = os.path.join(self.parent().data_dir, "locations.txt")
+                    with open(locations_file, "a", encoding="utf-8") as f:
                         f.write(f"{location_name}\n")
-                except Exception:
+                except (Exception, AttributeError):
                     pass  # Fail silently if can't write to file
             else:
                 # Select existing item
@@ -526,7 +531,26 @@ class OMACMainWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.db = DatabaseManager()
+        
+        # Set data directory based on platform
+        if platform.system() == 'Darwin':  # macOS
+            self.data_dir = os.path.expanduser('~/Library/Application Support/OMAC')
+            os.makedirs(self.data_dir, exist_ok=True)
+            self.photos_dir = os.path.join(self.data_dir, 'photos')
+            os.makedirs(self.photos_dir, exist_ok=True)
+            db_path = os.path.join(self.data_dir, 'action_figures.db')
+        elif platform.system() == 'Linux':  # Linux
+            self.data_dir = os.path.expanduser('~/Documents/OMAC')
+            os.makedirs(self.data_dir, exist_ok=True)
+            self.photos_dir = os.path.join(self.data_dir, 'photos')
+            os.makedirs(self.photos_dir, exist_ok=True)
+            db_path = os.path.join(self.data_dir, 'action_figures.db')
+        else:  # Other platforms (Windows, etc.)
+            self.data_dir = '.'
+            self.photos_dir = 'photos'
+            db_path = 'action_figures.db'
+        
+        self.db = DatabaseManager(db_path)
         self.current_figure_id = None
         self.init_ui()
         # Temporarily disconnect the resize signal to prevent saving during loading
@@ -1296,12 +1320,12 @@ class OMACMainWindow(QMainWindow):
             # Add photos if any were selected
             if dialog.photos:
                 # Create photos directory if it doesn't exist
-                os.makedirs("photos", exist_ok=True)
+                os.makedirs(self.photos_dir, exist_ok=True)
                 
                 for i, photo_path in enumerate(dialog.photos):
                     # Copy photo to local directory
                     filename = f"figure_{figure_id}_{i+1}_{os.path.basename(photo_path)}"
-                    new_path = os.path.join("photos", filename)
+                    new_path = os.path.join(self.photos_dir, filename)
                     
                     try:
                         import shutil
@@ -1345,12 +1369,12 @@ class OMACMainWindow(QMainWindow):
                 # Add new photos if any were selected
                 if dialog.photos:
                     # Create photos directory if it doesn't exist
-                    os.makedirs("photos", exist_ok=True)
+                    os.makedirs(self.photos_dir, exist_ok=True)
                     
                     for i, photo_path in enumerate(dialog.photos):
                         # Copy photo to local directory
                         filename = f"figure_{self.current_figure_id}_{i+1}_{os.path.basename(photo_path)}"
-                        new_path = os.path.join("photos", filename)
+                        new_path = os.path.join(self.photos_dir, filename)
                         
                         try:
                             import shutil
@@ -1409,7 +1433,7 @@ class OMACMainWindow(QMainWindow):
         """Create a complete backup of database and photos."""
         try:
             # Create backup directory if it doesn't exist
-            backup_dir = "backups"
+            backup_dir = os.path.join(self.data_dir, "backups")
             if not os.path.exists(backup_dir):
                 os.makedirs(backup_dir)
             
@@ -1465,9 +1489,9 @@ class OMACMainWindow(QMainWindow):
             tar_filename = f"photos_{timestamp}.tar.gz"
             tar_path = os.path.join(backup_dir, tar_filename)
             
-            if os.path.exists("photos") and os.listdir("photos"):
+            if os.path.exists(self.photos_dir) and os.listdir(self.photos_dir):
                 with tarfile.open(tar_path, "w:gz") as tar:
-                    tar.add("photos", arcname="photos")
+                    tar.add(self.photos_dir, arcname="photos")
             
             progress.setValue(3)
             if progress.wasCanceled():
@@ -1536,8 +1560,9 @@ To restore:
         """Restore database and photos from a backup archive."""
         try:
             # Show file dialog to select backup file
+            backup_dir = os.path.join(self.data_dir, "backups")
             backup_file, _ = QFileDialog.getOpenFileName(
-                self, "Select Backup File", "backups/", 
+                self, "Select Backup File", backup_dir, 
                 "Backup Files (*.zip);;All Files (*)"
             )
             
@@ -1636,13 +1661,13 @@ To restore:
                 if tar_file and os.path.exists(tar_file):
                     progress.setLabelText("Restoring photos...")
                     # Clear existing photos directory
-                    if os.path.exists("photos"):
-                        shutil.rmtree("photos")
-                    os.makedirs("photos")
+                    if os.path.exists(self.photos_dir):
+                        shutil.rmtree(self.photos_dir)
+                    os.makedirs(self.photos_dir)
                     
                     # Extract photos
                     with tarfile.open(tar_file, "r:gz") as tar:
-                        tar.extractall(".", filter='data')
+                        tar.extractall(self.data_dir, filter='data')
                 
                 progress.setValue(4)
                 if progress.wasCanceled():
