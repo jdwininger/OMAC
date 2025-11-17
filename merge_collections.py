@@ -148,9 +148,10 @@ class MergeWorker(QThread):
                 if resolution == 'update':
                     # Update existing figure with source data
                     figure_data = conflict['source'].copy()
-                    figure_data['id'] = conflict['target']['id']  # Keep target ID
+                    figure_id = conflict['target']['id']  # Get target ID
+                    figure_data.pop('id', None)  # Remove ID from data
                     figure_data['updated_at'] = datetime.now().isoformat()
-                    self.analysis.target_db.update_figure(figure_data)
+                    self.analysis.target_db.update_figure(figure_id, figure_data)
                     updated_figures += 1
                 elif resolution == 'merge_photos':
                     # Add source photos to existing figure
@@ -221,10 +222,9 @@ class MergeWorker(QThread):
 
     def _find_figure_id_for_photo(self, photo: Dict, source_figures: List[Dict]) -> Optional[int]:
         """Find the figure ID for a photo based on the merged data."""
-        # This is a simplified approach - in a real implementation,
-        # you'd need to match photos to figures more intelligently
-        if 'figure_id' in photo:
-            # Try to find the corresponding merged figure
+        # First try to use the figure_id from metadata if available
+        if 'figure_id' in photo and photo['figure_id'] is not None:
+            # This photo has metadata, find the corresponding merged figure
             for source_fig in source_figures:
                 if source_fig.get('id') == photo['figure_id']:
                     # Find the merged figure by name/series/manufacturer match
@@ -234,13 +234,56 @@ class MergeWorker(QThread):
                             target_fig.get('series', '').lower().strip() == source_fig.get('series', '').lower().strip() and
                             target_fig.get('manufacturer', '').lower().strip() == source_fig.get('manufacturer', '').lower().strip()):
                             return target_fig['id']
+        
+        # Fall back to parsing filename (for backwards compatibility)
+        filename = photo.get('filename', '')
+        if filename.startswith('figure_'):
+            try:
+                # Parse figure_id from filename
+                parts = filename.split('_', 2)
+                if len(parts) >= 2:
+                    source_figure_id = int(parts[1])
+                    
+                    # Find the source figure with this ID
+                    for source_fig in source_figures:
+                        if source_fig.get('id') == source_figure_id:
+                            # Find the merged figure by name/series/manufacturer match
+                            target_figures = self.analysis.target_db.get_all_figures()
+                            for target_fig in target_figures:
+                                if (target_fig['name'].lower().strip() == source_fig['name'].lower().strip() and
+                                    target_fig.get('series', '').lower().strip() == source_fig.get('series', '').lower().strip() and
+                                    target_fig.get('manufacturer', '').lower().strip() == source_fig.get('manufacturer', '').lower().strip()):
+                                    return target_fig['id']
+            except (ValueError, IndexError):
+                pass
+        
         return None
 
     def _merge_photos_for_figure(self, figure_id: int, source_figure: Dict):
         """Merge photos from source figure to existing figure."""
-        # This would add photos from the source figure to the target figure
-        # Implementation depends on how photos are linked in the source data
-        pass
+        source_figure_id = source_figure.get('id')
+        if not source_figure_id:
+            return
+            
+        # Find photos that belong to this source figure
+        for photo in self.source_data.get('photos', []):
+            filename = photo.get('filename', '')
+            if filename.startswith(f'figure_{source_figure_id}_'):
+                # This photo belongs to the source figure
+                if 'file_path' in photo and os.path.exists(photo['file_path']):
+                    # Copy the photo
+                    final_filename = self._resolve_photo_filename(filename)
+                    dest_path = os.path.join("photos", final_filename)
+                    shutil.copy2(photo['file_path'], dest_path)
+                    
+                    # Add to database
+                    photo_data = {
+                        'figure_id': figure_id,
+                        'file_path': dest_path,
+                        'caption': photo.get('caption', ''),
+                        'is_primary': photo.get('is_primary', False)
+                    }
+                    self.analysis.target_db.add_photo(photo_data)
 
 
 class MergeCollectionsDialog(QDialog):
@@ -255,6 +298,7 @@ class MergeCollectionsDialog(QDialog):
         self.source_data = None
         self.analysis = None
         self.merge_worker = None
+        self.temp_photo_dirs = []  # Track temp directories for cleanup
 
         self.init_ui()
 
@@ -362,7 +406,21 @@ class MergeCollectionsDialog(QDialog):
 
         self.setLayout(layout)
 
-    def select_backup_file(self):
+    def cleanup_temp_files(self):
+        """Clean up temporary photo directories."""
+        for temp_dir in self.temp_photo_dirs:
+            try:
+                import shutil
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir)
+            except Exception:
+                pass  # Ignore cleanup errors
+        self.temp_photo_dirs.clear()
+
+    def accept(self):
+        """Override accept to cleanup temp files."""
+        self.cleanup_temp_files()
+        super().accept()
         """Select an OMAC backup ZIP file."""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select OMAC Backup", "",
@@ -393,26 +451,45 @@ class MergeCollectionsDialog(QDialog):
                     zipf.extractall(temp_dir)
 
                 # Find CSV and TAR files
-                csv_file = None
+                figures_csv = None
+                photos_csv = None
                 tar_file = None
                 for file in os.listdir(temp_dir):
                     if file.endswith('.csv'):
-                        csv_file = os.path.join(temp_dir, file)
+                        # Check if it's figures or photos CSV
+                        if file.startswith('action_figures_'):
+                            figures_csv = os.path.join(temp_dir, file)
+                        elif file.startswith('photos_'):
+                            photos_csv = os.path.join(temp_dir, file)
                     elif file.endswith('.tar.gz'):
                         tar_file = os.path.join(temp_dir, file)
 
-                if not csv_file:
-                    raise Exception("No CSV file found in backup")
+                if not figures_csv:
+                    raise Exception("No figures CSV file found in backup")
 
                 # Load figures from CSV
                 figures = []
-                with open(csv_file, 'r', encoding='utf-8') as f:
+                with open(figures_csv, 'r', encoding='utf-8') as f:
                     reader = csv.DictReader(f)
                     for row in reader:
-                        figures.append(row)
+                        # Clean up the figure data - remove fields that aren't in the database
+                        figure_data = {}
+                        for key, value in row.items():
+                            # Skip database-generated fields and extra fields
+                            if key not in ['id', 'created_at', 'updated_at', 'photo_count', 'primary_photo']:
+                                if key in ['year']:
+                                    figure_data[key] = int(value) if value and value.isdigit() else None
+                                elif key in ['purchase_price', 'current_value']:
+                                    figure_data[key] = float(value) if value else None
+                                else:
+                                    figure_data[key] = value
+                        figures.append(figure_data)
 
-                # Load photos from TAR if available
+                # Load photos from CSV if available, otherwise fall back to TAR extraction
                 photos = []
+                photo_temp_dir = None
+                persistent_temp_dir = None
+                
                 if tar_file:
                     # Extract photos to temp location
                     photo_temp_dir = os.path.join(temp_dir, 'photos')
@@ -420,8 +497,54 @@ class MergeCollectionsDialog(QDialog):
 
                     with tarfile.open(tar_file, "r:gz") as tar:
                         tar.extractall(photo_temp_dir, filter='data')
-
-                    # Build photo list
+                    
+                    # Create a persistent temp directory for photos that will survive the method
+                    persistent_temp_dir = os.path.join(tempfile.gettempdir(), f'omac_backup_photos_{os.getpid()}')
+                    os.makedirs(persistent_temp_dir, exist_ok=True)
+                    self.temp_photo_dirs.append(persistent_temp_dir)  # Track for cleanup
+                
+                if photos_csv and photo_temp_dir:
+                    # Load photo metadata from CSV and match with extracted files
+                    with open(photos_csv, 'r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            # Convert data types
+                            photo_data = {}
+                            for key, value in row.items():
+                                if key == 'figure_id':
+                                    photo_data[key] = int(value) if value else None
+                                elif key == 'is_primary':
+                                    photo_data[key] = bool(int(value)) if value else False
+                                elif key == 'id':
+                                    # Skip the database ID as it's not needed for import
+                                    continue
+                                else:
+                                    photo_data[key] = value
+                            
+                            # Find the actual file in the extracted photos and copy to persistent location
+                            if 'file_path' in photo_data:
+                                filename = os.path.basename(photo_data['file_path'])
+                                source_path = None
+                                
+                                # Find the source file
+                                photos_subdir = os.path.join(photo_temp_dir, 'photos')
+                                if os.path.exists(photos_subdir):
+                                    for root, dirs, files in os.walk(photos_subdir):
+                                        if filename in files:
+                                            source_path = os.path.join(root, filename)
+                                            break
+                                
+                                if source_path and os.path.exists(source_path):
+                                    # Copy to persistent location
+                                    persistent_path = os.path.join(persistent_temp_dir, filename)
+                                    import shutil
+                                    shutil.copy2(source_path, persistent_path)
+                                    photo_data['file_path'] = persistent_path
+                                    photos.append(photo_data)
+                
+                # If no photos CSV or we couldn't load from CSV, fall back to old method
+                elif photo_temp_dir and not photos:
+                    # Build photo list from extracted files
                     for root, dirs, files in os.walk(photo_temp_dir):
                         for file in files:
                             if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):

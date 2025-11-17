@@ -34,6 +34,7 @@ class DatabaseManager:
                 scale TEXT,
                 condition TEXT,
                 purchase_price REAL,
+                current_value REAL,
                 location TEXT,
                 notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -70,8 +71,8 @@ class DatabaseManager:
         cursor.execute('''
             INSERT INTO action_figures 
             (name, series, manufacturer, year, scale, condition, purchase_price, 
-             location, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             current_value, location, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             figure_data.get('name', ''),
             figure_data.get('series', ''),
@@ -80,6 +81,7 @@ class DatabaseManager:
             figure_data.get('scale', ''),
             figure_data.get('condition', ''),
             figure_data.get('purchase_price'),
+            figure_data.get('current_value'),
             figure_data.get('location', ''),
             figure_data.get('notes', '')
         ))
@@ -97,7 +99,7 @@ class DatabaseManager:
         cursor.execute('''
             UPDATE action_figures SET
                 name = ?, series = ?, manufacturer = ?, year = ?, scale = ?,
-                condition = ?, purchase_price = ?, 
+                condition = ?, purchase_price = ?, current_value = ?,
                 location = ?, notes = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
@@ -109,6 +111,7 @@ class DatabaseManager:
             figure_data.get('scale', ''),
             figure_data.get('condition', ''),
             figure_data.get('purchase_price'),
+            figure_data.get('current_value'),
             figure_data.get('location', ''),
             figure_data.get('notes', ''),
             figure_id
@@ -219,6 +222,18 @@ class DatabaseManager:
             WHERE figure_id = ? 
             ORDER BY is_primary DESC, upload_date DESC
         ''', (figure_id,))
+        
+        photos = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return photos
+    
+    def get_all_photos(self) -> List[Dict]:
+        """Get all photos in the database."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT * FROM photos ORDER BY figure_id, upload_date DESC')
         
         photos = [dict(row) for row in cursor.fetchall()]
         conn.close()

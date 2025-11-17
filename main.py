@@ -1390,7 +1390,7 @@ class OMACMainWindow(QMainWindow):
             backup_path = os.path.join(backup_dir, backup_filename)
             
             # Show progress dialog
-            progress = QProgressDialog("Creating backup...", "Cancel", 0, 4, self)
+            progress = QProgressDialog("Creating backup...", "Cancel", 0, 5, self)
             progress.setWindowModality(Qt.WindowModality.WindowModal)
             progress.setMinimumDuration(0)
             progress.setValue(0)
@@ -1413,7 +1413,25 @@ class OMACMainWindow(QMainWindow):
             if progress.wasCanceled():
                 return
             
-            # Step 2: Create tar archive of photos
+            # Step 2: Export photo metadata to CSV
+            progress.setLabelText("Exporting photo metadata...")
+            photos_csv_filename = f"photos_{timestamp}.csv"
+            photos_csv_path = os.path.join(backup_dir, photos_csv_filename)
+            
+            all_photos = self.db.get_all_photos()
+            if all_photos:
+                with open(photos_csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+                    if all_photos:
+                        fieldnames = all_photos[0].keys()
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                        writer.writeheader()
+                        writer.writerows(all_photos)
+            
+            progress.setValue(2)
+            if progress.wasCanceled():
+                return
+            
+            # Step 3: Create tar archive of photos
             progress.setLabelText("Archiving photos...")
             tar_filename = f"photos_{timestamp}.tar.gz"
             tar_path = os.path.join(backup_dir, tar_filename)
@@ -1422,16 +1440,20 @@ class OMACMainWindow(QMainWindow):
                 with tarfile.open(tar_path, "w:gz") as tar:
                     tar.add("photos", arcname="photos")
             
-            progress.setValue(2)
+            progress.setValue(3)
             if progress.wasCanceled():
                 return
             
-            # Step 3: Create zip file containing both
+            # Step 4: Create zip file containing everything
             progress.setLabelText("Creating backup archive...")
             with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                # Add CSV file if it exists
+                # Add figures CSV file if it exists
                 if os.path.exists(csv_path):
                     zipf.write(csv_path, csv_filename)
+                
+                # Add photos CSV file if it exists
+                if os.path.exists(photos_csv_path):
+                    zipf.write(photos_csv_path, photos_csv_filename)
                 
                 # Add tar file if it exists
                 if os.path.exists(tar_path):
@@ -1443,6 +1465,7 @@ Created: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 This backup contains:
 - Database export: {csv_filename if os.path.exists(csv_path) else 'No figures in collection'}
+- Photo metadata: {photos_csv_filename if os.path.exists(photos_csv_path) else 'No photo metadata'}
 - Photos archive: {tar_filename if os.path.exists(tar_path) else 'No photos in collection'}
 
 To restore:
@@ -1452,18 +1475,20 @@ To restore:
 """
                 zipf.writestr("README.txt", readme_content)
             
-            progress.setValue(3)
+            progress.setValue(4)
             if progress.wasCanceled():
                 return
             
-            # Step 4: Clean up temporary files
+            # Step 5: Clean up temporary files
             progress.setLabelText("Cleaning up...")
             if os.path.exists(csv_path):
                 os.remove(csv_path)
+            if os.path.exists(photos_csv_path):
+                os.remove(photos_csv_path)
             if os.path.exists(tar_path):
                 os.remove(tar_path)
             
-            progress.setValue(4)
+            progress.setValue(5)
             
             # Show success message
             QMessageBox.information(
