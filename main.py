@@ -30,6 +30,7 @@ from PyQt6.QtGui import (
     QColor, QPalette
 )
 from database import DatabaseManager
+from merge_collections import MergeCollectionsDialog
 
 
 class ImageViewerDialog(QDialog):
@@ -396,6 +397,14 @@ class ActionFigureDialog(QDialog):
             
         self.location_combo.setCurrentText(self.figure_data.get('location', ''))
         self.notes_edit.setText(self.figure_data.get('notes', ''))
+        
+        # Load existing photos if editing
+        if self.is_edit_mode and hasattr(self, 'parent') and hasattr(self.parent(), 'db'):
+            figure_id = self.figure_data.get('id')
+            if figure_id:
+                photos = self.parent().db.get_figure_photos(figure_id)
+                self.photos = [photo['file_path'] for photo in photos]
+                self.update_photo_display()
     
     def add_photos(self):
         """Add photos to the figure."""
@@ -526,8 +535,8 @@ class OMACMainWindow(QMainWindow):
         # Reconnect the signal
         self.collection_table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         
-        # Load saved column widths after collection is loaded
-        self.load_column_widths()
+        # Load saved column settings (visibility, order, widths)
+        self.load_column_settings()
         
     def init_ui(self):
         """Initialize the user interface."""
@@ -669,8 +678,164 @@ class OMACMainWindow(QMainWindow):
     
     def closeEvent(self, event):
         """Handle application close event."""
+        try:
+            # Save application state
+            self.save_column_widths()
+            self.save_column_visibility()
+            self.save_column_order()
+
+            # Clean up any running threads or background processes
+            # Note: Qt will automatically clean up child widgets and threads
+
+            # Call parent close event
+            super().closeEvent(event)
+
+        except Exception as e:
+            # Log the error but don't prevent closing
+            print(f"Error during application shutdown: {e}")
+            super().closeEvent(event)
+    
+    def show_column_context_menu(self, position):
+        """Show context menu for column management."""
+        header = self.collection_table.horizontalHeader()
+        column = header.logicalIndexAt(position.x())
+        
+        if column < 0:
+            return
+            
+        menu = QMenu(self)
+        
+        # Add show/hide actions for each column
+        for col in range(self.collection_table.columnCount()):
+            column_name = self.collection_table.horizontalHeaderItem(col).text()
+            action = QAction(f"Show {column_name}", self)
+            action.setCheckable(True)
+            action.setChecked(not self.collection_table.isColumnHidden(col))
+            action.setData(col)
+            action.triggered.connect(self.toggle_column_visibility)
+            menu.addAction(action)
+        
+        menu.addSeparator()
+        
+        # Add reset columns action
+        reset_action = QAction("Reset Column Layout", self)
+        reset_action.triggered.connect(self.reset_column_layout)
+        menu.addAction(reset_action)
+        
+        menu.exec(header.mapToGlobal(position))
+    
+    def toggle_column_visibility(self):
+        """Toggle visibility of a column."""
+        action = self.sender()
+        if action:
+            column = action.data()
+            visible = action.isChecked()
+            self.collection_table.setColumnHidden(column, not visible)
+            self.save_column_visibility()
+    
+    def reset_column_layout(self):
+        """Reset columns to default layout."""
+        # Show all columns
+        for col in range(self.collection_table.columnCount()):
+            self.collection_table.setColumnHidden(col, False)
+        
+        # Reset column order (move columns back to original positions)
+        header = self.collection_table.horizontalHeader()
+        for logical_index in range(self.collection_table.columnCount()):
+            visual_index = header.visualIndex(logical_index)
+            if visual_index != logical_index:
+                header.moveSection(visual_index, logical_index)
+        
+        # Reset column widths to default percentages
+        default_percentages = [30.0, 20.0, 20.0, 10.0, 15.0, 5.0]  # Name, Series, Manufacturer, Year, Condition, Photos
+        viewport_width = self.collection_table.viewport().width()
+        if viewport_width > 0:
+            for col, percentage in enumerate(default_percentages):
+                width = int((percentage / 100.0) * viewport_width)
+                self.collection_table.setColumnWidth(col, width)
+        
+        # Save the reset state
+        self.save_column_visibility()
+        self.save_column_order()
         self.save_column_widths()
-        super().closeEvent(event)
+    
+    def save_column_visibility(self):
+        """Save column visibility settings."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        for col in range(self.collection_table.columnCount()):
+            visible = not self.collection_table.isColumnHidden(col)
+            settings.setValue(f"column_visible_{col}", visible)
+    
+    def save_column_order(self):
+        """Save column order settings."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        header = self.collection_table.horizontalHeader()
+        for logical_index in range(self.collection_table.columnCount()):
+            visual_index = header.visualIndex(logical_index)
+            settings.setValue(f"column_order_{logical_index}", visual_index)
+    
+    def load_column_settings(self):
+        """Load column visibility, order, and width settings."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        
+        # Load column visibility
+        for col in range(self.collection_table.columnCount()):
+            visible = settings.value(f"column_visible_{col}", True, type=bool)
+            self.collection_table.setColumnHidden(col, not visible)
+        
+        # Load column order
+        header = self.collection_table.horizontalHeader()
+        # First, collect all the visual positions
+        order_map = {}
+        for logical_index in range(self.collection_table.columnCount()):
+            visual_index = settings.value(f"column_order_{logical_index}", logical_index, type=int)
+            order_map[logical_index] = visual_index
+        
+        # Apply the ordering by moving sections
+        # We need to be careful about the order of operations
+        for logical_index in range(self.collection_table.columnCount()):
+            target_visual = order_map[logical_index]
+            current_visual = header.visualIndex(logical_index)
+            if current_visual != target_visual:
+                # Move this logical index to its target visual position
+                header.moveSection(current_visual, target_visual)
+        
+        # Load column widths (existing functionality)
+        self.load_column_widths()
+    
+    def load_column_widths(self):
+        """Load saved column widths."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        
+        # Check if we have saved percentage data
+        has_percentage_data = any(settings.value(f"column_percentage_{col}") is not None 
+                                for col in range(self.collection_table.columnCount()))
+        
+        if has_percentage_data:
+            # Load saved percentages and apply widths
+            saved_percentages = []
+            for col in range(self.collection_table.columnCount()):
+                percentage_value = settings.value(f"column_percentage_{col}")
+                if percentage_value is not None:
+                    try:
+                        percentage = float(percentage_value)
+                        if 0 <= percentage <= 100:
+                            saved_percentages.append(percentage)
+                        else:
+                            saved_percentages.append(10.0)  # fallback
+                    except (ValueError, TypeError):
+                        saved_percentages.append(10.0)  # fallback
+                else:
+                    saved_percentages.append(10.0)  # fallback
+            
+            # Get available width for columns
+            viewport_width = self.collection_table.viewport().width()
+            if viewport_width > 0:
+                # Calculate and set column widths based on percentages
+                for col, percentage in enumerate(saved_percentages):
+                    width = int((percentage / 100.0) * viewport_width)
+                    if width > 0:
+                        self.collection_table.setColumnWidth(col, width)
     
     def create_menu_bar(self):
         """Create the application menu bar."""
@@ -719,6 +884,10 @@ class OMACMainWindow(QMainWindow):
         restore_action = QAction('&Restore Database && Photos', self)
         restore_action.triggered.connect(self.restore_database)
         self.file_menu.addAction(restore_action)
+        
+        merge_action = QAction('&Merge Collections...', self)
+        merge_action.triggered.connect(self.merge_collections)
+        self.file_menu.addAction(merge_action)
         
         self.file_menu.addSeparator()
         
@@ -901,8 +1070,16 @@ class OMACMainWindow(QMainWindow):
         self.collection_table.itemSelectionChanged.connect(self.on_selection_changed)
         self.collection_table.cellDoubleClicked.connect(self.edit_figure)
         
+        # Enable column moving and context menu
+        header = self.collection_table.horizontalHeader()
+        header.setSectionsMovable(True)  # Allow column reordering
+        header.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        header.customContextMenuRequested.connect(self.show_column_context_menu)
+        
         # Connect to column resize signal to save widths
         self.collection_table.horizontalHeader().sectionResized.connect(self.save_column_widths)
+        # Connect to column move signal to save order
+        self.collection_table.horizontalHeader().sectionMoved.connect(self.save_column_order)
         
         # Add sidebar and table to left layout
         left_layout.addWidget(sidebar_widget)
@@ -1130,6 +1307,38 @@ class OMACMainWindow(QMainWindow):
             success = self.db.update_figure(self.current_figure_id, form_data)
             
             if success:
+                # Handle photos - delete existing photos and add new ones
+                # First, get existing photos
+                existing_photos = self.db.get_figure_photos(self.current_figure_id)
+                
+                # Delete existing photos from database and filesystem
+                for photo in existing_photos:
+                    photo_path = photo['file_path']
+                    if os.path.exists(photo_path):
+                        try:
+                            os.remove(photo_path)
+                        except Exception:
+                            pass  # Continue even if file deletion fails
+                    self.db.delete_photo(photo['id'])
+                
+                # Add new photos if any were selected
+                if dialog.photos:
+                    # Create photos directory if it doesn't exist
+                    os.makedirs("photos", exist_ok=True)
+                    
+                    for i, photo_path in enumerate(dialog.photos):
+                        # Copy photo to local directory
+                        filename = f"figure_{self.current_figure_id}_{i+1}_{os.path.basename(photo_path)}"
+                        new_path = os.path.join("photos", filename)
+                        
+                        try:
+                            import shutil
+                            shutil.copy2(photo_path, new_path)
+                            is_primary = i == 0  # First photo is primary
+                            self.db.add_photo(self.current_figure_id, new_path, is_primary=is_primary)
+                        except Exception as e:
+                            QMessageBox.warning(self, "Photo Error", f"Could not save photo: {str(e)}")
+                
                 self.load_collection()
                 self.show_figure_details(self.current_figure_id)
                 self.status_bar.showMessage("Figure updated successfully", 3000)
@@ -1405,6 +1614,14 @@ To restore:
                 f"An error occurred while restoring from backup:\n\n{str(e)}"
             )
         
+    def merge_collections(self):
+        """Merge data from another collection into the current one."""
+        from merge_collections import MergeCollectionsDialog
+        dialog = MergeCollectionsDialog(self)
+        dialog.exec()
+        
+        dialog.exec()
+        
     def update_status_bar(self):
         """Update the status bar with collection statistics."""
         stats = self.db.get_database_stats()
@@ -1428,20 +1645,37 @@ To restore:
 
 def main():
     """Main function - entry point of the application."""
-    # Create QApplication instance
-    app = QApplication(sys.argv)
-    
-    # Set application properties
-    app.setApplicationName("OMAC")
-    app.setApplicationVersion("2.0.0")
-    app.setOrganizationName("One 'Mazing ActionFigure Team")
-    
-    # Create and show main window
-    window = OMACMainWindow()
-    window.show()
-    
-    # Start event loop
-    sys.exit(app.exec())
+    try:
+        # Create QApplication instance
+        app = QApplication(sys.argv)
+
+        # Set application properties
+        app.setApplicationName("OMAC")
+        app.setApplicationVersion("2.0.0")
+        app.setOrganizationName("One 'Mazing ActionFigure Team")
+
+        # Handle cleanup on application exit
+        app.aboutToQuit.connect(on_application_quit)
+
+        # Create and show main window
+        window = OMACMainWindow()
+        window.show()
+
+        # Start event loop
+        sys.exit(app.exec())
+
+    except Exception as e:
+        print(f"Error starting application: {e}")
+        sys.exit(1)
+
+
+def on_application_quit():
+    """Handle application quit cleanup."""
+    try:
+        # Any final cleanup can go here
+        print("Application shutting down gracefully...")
+    except Exception as e:
+        print(f"Error during application quit: {e}")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,9 @@ A comprehensive desktop application for managing action figure collections with 
 - **Complete Collection Management**: Add, edit, delete, and organize your action figures
 - **Multi-Photo Support**: Upload and manage multiple photos per figure
 - **Advanced Search**: Find figures by name, series, or manufacturer
+- **Customizable Table View**: Show/hide columns and rearrange column order
 - **Data Backup & Restore**: Create complete backups and restore from them
+- **Merge Collections**: Combine collections from other OMAC installations or CSV files
 - **Unique Menu Layout**: Traditional menu bar at the top with File, View, and Help menus
 - **Theme Support**: Switch between light and dark themes
 - **SQLite Database**: Reliable local database storage
@@ -62,8 +64,55 @@ A comprehensive desktop application for managing action figure collections with 
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+      pip install -r requirements.txt
    ```
+
+## Building a Standalone macOS App
+   ```
+
+### Cloud Backup Setup (Optional)
+
+OMAC supports backing up your collection to Google Drive for secure offsite storage.
+
+#### Quick Setup (Recommended)
+
+**Option 1: From OMAC Application**
+1. **Launch OMAC**
+2. **Go to File → Setup Google Drive**
+3. **Follow the step-by-step wizard**
+4. **Drag and drop your credentials.json file** or use the file selector
+
+**Option 2: Standalone Setup Script**
+1. **Run the setup script**: `python drive_setup.py`
+2. **Follow the wizard instructions**
+
+The setup wizard will:
+- Open the Google Cloud Console for you
+- Guide you through enabling the Drive API
+- Help you download and configure credentials
+- Test the connection automatically
+
+### Manual Setup (Advanced)
+
+If you prefer to set it up manually:
+
+1. **Google Cloud Console Setup**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable the Google Drive API
+   - Create OAuth 2.0 credentials for a desktop application
+   - Download the `credentials.json` file
+
+2. **Configure OMAC**
+   - Place `credentials.json` in the OMAC application directory
+   - First use will prompt for Google authentication
+   - Grant permission for OMAC to access Google Drive
+
+3. **Using Cloud Backup**
+   - File → "Backup to Cloud" - Creates and uploads a backup
+   - File → "Manage Cloud Backups" - View, download, or restore cloud backups
+   - **One-click restore**: Select a backup and click "Restore Backup" for automatic restoration
+   - **Download only**: Get backup files without restoring (for manual restoration)
 
 ## Building a Standalone macOS App
 
@@ -113,6 +162,7 @@ python main.py
 OMAC/
 ├── main.py              # Main application window and GUI
 ├── database.py          # SQLite database manager
+├── merge_collections.py # Collection merging functionality
 ├── requirements.txt     # Python dependencies
 ├── action_figures.db    # SQLite database (created on first run)
 ├── photos/              # Photo storage directory (created automatically)
@@ -148,7 +198,9 @@ OMAC/
 - **View Details**: Click any figure to see detailed information and photos
 - **Backup**: Create complete backups via File → Backup Database & Photos menu
 - **Restore**: Restore from backup via File → Restore Database & Photos menu
-- **Theme**: Switch between light and dark themes via View → Theme menu
+- **Column Management**: Right-click table headers to show/hide columns and reset layout
+- **Column Reordering**: Drag column headers to rearrange column order
+- **Theme**: Switch between light and dark themes via View menu
 
 ### Photo Features
 
@@ -166,6 +218,15 @@ OMAC/
 - **Restore Process**: Automatically extracts and imports backup data
 - **Safety Option**: Choose to backup current data before restoring
 - **README Included**: Each backup contains restoration instructions
+
+### Merge Collections
+
+- **Combine Collections**: File → Merge Collections to import from another OMAC backup or CSV file
+- **Intelligent Conflict Resolution**: Choose how to handle duplicate figures (skip, update, or merge photos)
+- **Photo Conflict Handling**: Automatically rename incoming photos with conflicting filenames
+- **Analysis Preview**: See exactly what will be merged before proceeding
+- **Progress Tracking**: Monitor merge progress with detailed status updates
+- **Safe Operation**: No data loss - conflicts are handled according to your preferences
 
 ## Database Schema
 
@@ -210,9 +271,8 @@ python main.py
 
 ## Future Enhancements
 
-- **Export/Import**: CSV export and import functionality
-- **Advanced Photo Viewer**: Full-screen image viewer with zoom
-- **Backup/Restore**: Database backup and restore features
+- **Export/Import**: Additional export formats beyond CSV
+- **Advanced Photo Viewer**: Full-screen image viewer with zoom and slideshow
 - **Statistics**: Advanced collection analytics and reporting
 - **Barcode Scanning**: UPC/EAN barcode support for quick entry
 - **Online Integration**: Price tracking and market value updates
