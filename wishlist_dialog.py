@@ -46,8 +46,8 @@ class WishlistDialog(QDialog):
         table_layout = QVBoxLayout()
 
         self.wishlist_table = QTableWidget()
-        self.wishlist_table.setColumnCount(5)
-        self.wishlist_table.setHorizontalHeaderLabels(["Name", "Series", "Manufacturer", "Priority", "Target Price"])
+        self.wishlist_table.setColumnCount(6)
+        self.wishlist_table.setHorizontalHeaderLabels(["Name", "Series", "Wave", "Manufacturer", "Priority", "Target Price"])
         self.wishlist_table.horizontalHeader().setStretchLastSection(True)
         self.wishlist_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.wishlist_table.itemSelectionChanged.connect(self.on_item_selected)
@@ -91,6 +91,11 @@ class WishlistDialog(QDialog):
         self.series_edit.setPlaceholderText("Series name")
         self.series_edit.setMinimumWidth(250)
         form_layout.addRow("Series:", self.series_edit)
+
+        self.wave_edit = QLineEdit()
+        self.wave_edit.setPlaceholderText("Wave (e.g., Wave 1, Series 1)")
+        self.wave_edit.setMinimumWidth(250)
+        form_layout.addRow("Wave:", self.wave_edit)
 
         self.manufacturer_edit = QLineEdit()
         self.manufacturer_edit.setPlaceholderText("Manufacturer")
@@ -181,12 +186,13 @@ class WishlistDialog(QDialog):
         for row, item in enumerate(items):
             self.wishlist_table.setItem(row, 0, QTableWidgetItem(item.get('name', '')))
             self.wishlist_table.setItem(row, 1, QTableWidgetItem(item.get('series', '')))
-            self.wishlist_table.setItem(row, 2, QTableWidgetItem(item.get('manufacturer', '')))
-            self.wishlist_table.setItem(row, 3, QTableWidgetItem(item.get('priority', 'medium')))
+            self.wishlist_table.setItem(row, 2, QTableWidgetItem(item.get('wave', '')))
+            self.wishlist_table.setItem(row, 3, QTableWidgetItem(item.get('manufacturer', '')))
+            self.wishlist_table.setItem(row, 4, QTableWidgetItem(item.get('priority', 'medium')))
 
             target_price = item.get('target_price', 0)
             price_text = f"${target_price:.2f}" if target_price else ""
-            self.wishlist_table.setItem(row, 4, QTableWidgetItem(price_text))
+            self.wishlist_table.setItem(row, 5, QTableWidgetItem(price_text))
 
             # Store the item ID in the row
             self.wishlist_table.item(row, 0).setData(Qt.ItemDataRole.UserRole, item['id'])
@@ -221,6 +227,7 @@ class WishlistDialog(QDialog):
         """Load item details into the form."""
         self.name_edit.setText(item.get('name', ''))
         self.series_edit.setText(item.get('series', ''))
+        self.wave_edit.setText(item.get('wave', ''))
         self.manufacturer_edit.setText(item.get('manufacturer', ''))
         self.year_spin.setValue(item.get('year', 2024) or 2024)
         self.scale_edit.setText(item.get('scale', ''))
@@ -233,6 +240,7 @@ class WishlistDialog(QDialog):
         self.current_item_id = None
         self.name_edit.clear()
         self.series_edit.clear()
+        self.wave_edit.clear()
         self.manufacturer_edit.clear()
         self.year_spin.setValue(2024)
         self.scale_edit.clear()
@@ -260,6 +268,7 @@ class WishlistDialog(QDialog):
         item_data = {
             'name': self.name_edit.text().strip(),
             'series': self.series_edit.text().strip(),
+            'wave': self.wave_edit.text().strip(),
             'manufacturer': self.manufacturer_edit.text().strip(),
             'year': self.year_spin.value(),
             'scale': self.scale_edit.text().strip(),
@@ -329,6 +338,7 @@ class WishlistDialog(QDialog):
         figure_data = {
             'name': item.get('name', ''),
             'series': item.get('series', ''),
+            'wave': item.get('wave', ''),
             'manufacturer': item.get('manufacturer', ''),
             'year': item.get('year'),
             'scale': item.get('scale', ''),

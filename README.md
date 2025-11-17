@@ -9,6 +9,7 @@ A comprehensive desktop application for managing action figure collections with 
 - **Wishlist Management**: Track desired figures and easily move them to your collection when acquired
 - **Multi-Photo Support**: Upload and manage multiple photos per figure
 - **Advanced Search**: Find figures by name, series, or manufacturer
+- **Column Sorting**: Click any column header to sort ascending/descending (Name, Series, Wave, Manufacturer, Year, Condition, Photos)
 - **Customizable Table View**: Show/hide columns and rearrange column order
 - **Data Backup & Restore**: Create complete backups and restore from them
 - **Merge Collections**: Combine collections from other OMAC installations or CSV files
@@ -17,7 +18,7 @@ A comprehensive desktop application for managing action figure collections with 
 - **Cross-Platform**: Works on Windows, macOS, and Linux with platform-appropriate data storage
 
 ### Data Tracking
-- Figure name, series, and manufacturer
+- Figure name, series, wave, and manufacturer
 - Year of release and scale information
 - Condition tracking (Mint in Package, Loose, etc.)
 - Purchase price
@@ -33,7 +34,7 @@ A comprehensive desktop application for managing action figure collections with 
 
 ### 🎯 Wishlist Management
 - Track desired action figures you want to acquire
-- Add wishlist items with name, series, manufacturer, and target price
+- Add wishlist items with name, series, wave, manufacturer, and target price
 - Set priority levels (Low, Medium, High) for wishlist items
 - Move items from wishlist to main collection when acquired
 - Dedicated wishlist dialog with full CRUD operations
@@ -255,10 +256,15 @@ OMAC/
 ## Database Schema
 
 ### Action Figures Table
-- ID, Name, Series, Manufacturer
+- ID, Name, Series, Wave, Manufacturer
 - Year, Scale, Condition
 - Purchase Price, Location, Notes
 - Created/Updated timestamps
+
+### Wishlist Table
+- ID, Name, Series, Wave, Manufacturer
+- Year, Scale, Target Price, Priority
+- Notes, Created/Updated timestamps
 
 ### Photos Table
 - ID, Figure ID (foreign key)

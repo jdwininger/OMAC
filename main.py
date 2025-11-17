@@ -170,6 +170,9 @@ class ActionFigureDialog(QDialog):
         self.series_edit = QLineEdit()
         self.series_edit.setFixedWidth(input_width)
 
+        self.wave_edit = QLineEdit()
+        self.wave_edit.setFixedWidth(input_width)
+
         self.manufacturer_combo = QComboBox()
         # Start with common manufacturers and add any saved ones
         default_manufacturers = [
@@ -249,6 +252,14 @@ class ActionFigureDialog(QDialog):
         series_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         details_layout.addWidget(series_label, row, 0)
         details_layout.addWidget(self.series_edit, row, 1, Qt.AlignmentFlag.AlignLeft)
+        row += 1
+
+        # Wave field
+        wave_label = QLabel("Wave:")
+        wave_label.setStyleSheet(label_style)
+        wave_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        details_layout.addWidget(wave_label, row, 0)
+        details_layout.addWidget(self.wave_edit, row, 1, Qt.AlignmentFlag.AlignLeft)
         row += 1
 
         # Manufacturer field with add button
@@ -376,6 +387,7 @@ class ActionFigureDialog(QDialog):
             
         self.name_edit.setText(self.figure_data.get('name', ''))
         self.series_edit.setText(self.figure_data.get('series', ''))
+        self.wave_edit.setText(self.figure_data.get('wave', ''))
         
         # Handle manufacturer combo box
         manufacturer = self.figure_data.get('manufacturer', '')
@@ -447,6 +459,7 @@ class ActionFigureDialog(QDialog):
         return {
             'name': self.name_edit.text().strip(),
             'series': self.series_edit.text().strip(),
+            'wave': self.wave_edit.text().strip(),
             'manufacturer': self.manufacturer_combo.currentText().strip(),
             'year': self.year_spin.value() if self.year_spin.value() > 1900 else None,
             'scale': self.scale_combo.currentText().strip(),
@@ -552,6 +565,11 @@ class OMACMainWindow(QMainWindow):
         
         self.db = DatabaseManager(db_path)
         self.current_figure_id = None
+        
+        # Sorting state
+        self.sort_column = 'name'  # Default sort column
+        self.sort_order = 'ASC'    # Default sort order
+        
         self.init_ui()
         # Temporarily disconnect the resize signal to prevent saving during loading
         self.collection_table.horizontalHeader().sectionResized.disconnect(self.save_column_widths)
@@ -1107,13 +1125,17 @@ class OMACMainWindow(QMainWindow):
         
         # Collection table
         self.collection_table = QTableWidget()
-        self.collection_table.setColumnCount(6)
+        self.collection_table.setColumnCount(7)
         self.collection_table.setHorizontalHeaderLabels([
-            "Name", "Series", "Manufacturer", "Year", "Condition", "Photos"
+            "Name", "Series", "Wave", "Manufacturer", "Year", "Condition", "Photos"
         ])
         self.collection_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.collection_table.itemSelectionChanged.connect(self.on_selection_changed)
         self.collection_table.cellDoubleClicked.connect(self.edit_figure)
+        
+        # Enable sorting
+        self.collection_table.setSortingEnabled(True)
+        self.collection_table.horizontalHeader().sectionClicked.connect(self.on_header_clicked)
         
         # Enable column moving and context menu
         header = self.collection_table.horizontalHeader()
@@ -1189,45 +1211,49 @@ class OMACMainWindow(QMainWindow):
         
     def load_collection(self):
         """Load the action figure collection into the table."""
-        figures = self.db.get_all_figures()
+        figures = self.db.get_all_figures(self.sort_column, self.sort_order)
         
         self.collection_table.setRowCount(len(figures))
         
         for row, figure in enumerate(figures):
             self.collection_table.setItem(row, 0, QTableWidgetItem(figure.get('name', '')))
             self.collection_table.setItem(row, 1, QTableWidgetItem(figure.get('series', '')))
-            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('manufacturer', '')))
-            self.collection_table.setItem(row, 3, QTableWidgetItem(str(figure.get('year', ''))))
-            self.collection_table.setItem(row, 4, QTableWidgetItem(figure.get('condition', '')))
-            self.collection_table.setItem(row, 5, QTableWidgetItem(str(figure.get('photo_count', 0))))
+            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('wave', '')))
+            self.collection_table.setItem(row, 3, QTableWidgetItem(figure.get('manufacturer', '')))
+            self.collection_table.setItem(row, 4, QTableWidgetItem(str(figure.get('year', ''))))
+            self.collection_table.setItem(row, 5, QTableWidgetItem(figure.get('condition', '')))
+            self.collection_table.setItem(row, 6, QTableWidgetItem(str(figure.get('photo_count', 0))))
             
             # Store figure ID in first column
             self.collection_table.item(row, 0).setData(Qt.ItemDataRole.UserRole, figure['id'])
         
         self.collection_table.resizeColumnsToContents()
         self.update_status_bar()
+        self.update_header_sort_indicator()
         
     def search_collection(self, search_term: str):
         """Search the collection based on search term."""
         if search_term.strip():
-            figures = self.db.search_figures(search_term)
+            figures = self.db.search_figures(search_term, self.sort_column, self.sort_order)
         else:
-            figures = self.db.get_all_figures()
+            figures = self.db.get_all_figures(self.sort_column, self.sort_order)
             
         self.collection_table.setRowCount(len(figures))
         
         for row, figure in enumerate(figures):
             self.collection_table.setItem(row, 0, QTableWidgetItem(figure.get('name', '')))
             self.collection_table.setItem(row, 1, QTableWidgetItem(figure.get('series', '')))
-            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('manufacturer', '')))
-            self.collection_table.setItem(row, 3, QTableWidgetItem(str(figure.get('year', ''))))
-            self.collection_table.setItem(row, 4, QTableWidgetItem(figure.get('condition', '')))
-            self.collection_table.setItem(row, 5, QTableWidgetItem(str(figure.get('photo_count', 0))))
+            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('wave', '')))
+            self.collection_table.setItem(row, 3, QTableWidgetItem(figure.get('manufacturer', '')))
+            self.collection_table.setItem(row, 4, QTableWidgetItem(str(figure.get('year', ''))))
+            self.collection_table.setItem(row, 5, QTableWidgetItem(figure.get('condition', '')))
+            self.collection_table.setItem(row, 6, QTableWidgetItem(str(figure.get('photo_count', 0))))
             
             # Store figure ID in first column
             self.collection_table.item(row, 0).setData(Qt.ItemDataRole.UserRole, figure['id'])
         
         self.collection_table.resizeColumnsToContents()
+        self.update_header_sort_indicator()
         
     def on_selection_changed(self):
         """Handle selection change in collection table."""
@@ -1237,6 +1263,48 @@ class OMACMainWindow(QMainWindow):
             if item:
                 figure_id = item.data(Qt.ItemDataRole.UserRole)
                 self.show_figure_details(figure_id)
+                
+    def on_header_clicked(self, logical_index: int):
+        """Handle header click for sorting."""
+        # Map column index to column name
+        column_names = ['name', 'series', 'wave', 'manufacturer', 'year', 'condition', 'photos']
+        
+        if logical_index < len(column_names):
+            column = column_names[logical_index]
+            
+            # Toggle sort order if same column clicked again
+            if self.sort_column == column:
+                self.sort_order = 'DESC' if self.sort_order == 'ASC' else 'ASC'
+            else:
+                self.sort_column = column
+                self.sort_order = 'ASC'  # Default to ascending for new column
+            
+            # Update header to show sort indicator
+            self.update_header_sort_indicator()
+            
+            # Reload collection with new sorting
+            self.load_collection()
+            
+    def update_header_sort_indicator(self):
+        """Update the header to show sort indicator for current sort column."""
+        header = self.collection_table.horizontalHeader()
+        column_names = ['name', 'series', 'wave', 'manufacturer', 'year', 'condition', 'photos']
+        
+        # Reset all headers to default
+        for i in range(len(column_names)):
+            current_text = header.model().headerData(i, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
+            if current_text:
+                # Remove any existing sort indicators
+                clean_text = current_text.replace(' ↑', '').replace(' ↓', '')
+                header.model().setHeaderData(i, Qt.Orientation.Horizontal, clean_text, Qt.ItemDataRole.DisplayRole)
+        
+        # Add sort indicator to current sort column
+        if self.sort_column in column_names:
+            column_index = column_names.index(self.sort_column)
+            current_text = header.model().headerData(column_index, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
+            if current_text:
+                indicator = ' ↑' if self.sort_order == 'ASC' else ' ↓'
+                header.model().setHeaderData(column_index, Qt.Orientation.Horizontal, current_text + indicator, Qt.ItemDataRole.DisplayRole)
                 
     def show_figure_details(self, figure_id: int):
         """Show detailed information for a specific figure."""
@@ -1453,7 +1521,7 @@ class OMACMainWindow(QMainWindow):
             csv_filename = f"action_figures_{timestamp}.csv"
             csv_path = os.path.join(backup_dir, csv_filename)
             
-            figures = self.db.get_all_figures()
+            figures = self.db.get_all_figures('name', 'ASC')
             if figures:
                 with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
                     if figures:

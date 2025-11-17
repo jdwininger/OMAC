@@ -29,6 +29,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 series TEXT,
+                wave TEXT,
                 manufacturer TEXT,
                 year INTEGER,
                 scale TEXT,
@@ -48,6 +49,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 series TEXT,
+                wave TEXT,
                 manufacturer TEXT,
                 year INTEGER,
                 scale TEXT,
@@ -75,8 +77,20 @@ class DatabaseManager:
         # Create indexes for better performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_figures_name ON action_figures(name)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_figures_series ON action_figures(series)')
-        cursor.execute('CREATE INDEX IF NOT EXISTS idx_wishlist_name ON wishlist(name)')
-        cursor.execute('CREATE INDEX IF NOT EXISTS idx_wishlist_series ON wishlist(series)')
+        
+        # Add wave column to existing databases if it doesn't exist
+        try:
+            cursor.execute("SELECT wave FROM action_figures LIMIT 1")
+        except sqlite3.OperationalError:
+            # Column doesn't exist, add it
+            cursor.execute("ALTER TABLE action_figures ADD COLUMN wave TEXT")
+        
+        # Add wave column to wishlist table if it doesn't exist
+        try:
+            cursor.execute("SELECT wave FROM wishlist LIMIT 1")
+        except sqlite3.OperationalError:
+            # Column doesn't exist, add it
+            cursor.execute("ALTER TABLE wishlist ADD COLUMN wave TEXT")
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_photos_figure_id ON photos(figure_id)')
         
         conn.commit()
@@ -162,18 +176,32 @@ class DatabaseManager:
         conn.close()
         return success
     
-    def get_all_figures(self) -> List[Dict]:
+    def get_all_figures(self, sort_column: str = 'name', sort_order: str = 'ASC') -> List[Dict]:
         """Get all action figures from the database."""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        cursor.execute('''
+        # Map column names to database fields
+        column_mapping = {
+            'name': 'af.name',
+            'series': 'af.series', 
+            'wave': 'af.wave',
+            'manufacturer': 'af.manufacturer',
+            'year': 'af.year',
+            'condition': 'af.condition',
+            'photos': 'photo_count'
+        }
+        
+        db_column = column_mapping.get(sort_column, 'af.name')
+        order = 'ASC' if sort_order.upper() == 'ASC' else 'DESC'
+        
+        cursor.execute(f'''
             SELECT af.*, 
                    (SELECT COUNT(*) FROM photos p WHERE p.figure_id = af.id) as photo_count,
                    (SELECT file_path FROM photos p WHERE p.figure_id = af.id AND p.is_primary = 1 LIMIT 1) as primary_photo
             FROM action_figures af
-            ORDER BY af.name
+            ORDER BY {db_column} {order}
         ''')
         
         figures = [dict(row) for row in cursor.fetchall()]
@@ -191,21 +219,35 @@ class DatabaseManager:
         conn.close()
         return dict(row) if row else None
     
-    def search_figures(self, search_term: str) -> List[Dict]:
+    def search_figures(self, search_term: str, sort_column: str = 'name', sort_order: str = 'ASC') -> List[Dict]:
         """Search for action figures by name or series."""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
+        # Map column names to database fields
+        column_mapping = {
+            'name': 'af.name',
+            'series': 'af.series', 
+            'wave': 'af.wave',
+            'manufacturer': 'af.manufacturer',
+            'year': 'af.year',
+            'condition': 'af.condition',
+            'photos': 'photo_count'
+        }
+        
+        db_column = column_mapping.get(sort_column, 'af.name')
+        order = 'ASC' if sort_order.upper() == 'ASC' else 'DESC'
+        
         search_term = f"%{search_term}%"
-        cursor.execute('''
+        cursor.execute(f'''
             SELECT af.*, 
                    (SELECT COUNT(*) FROM photos p WHERE p.figure_id = af.id) as photo_count,
                    (SELECT file_path FROM photos p WHERE p.figure_id = af.id AND p.is_primary = 1 LIMIT 1) as primary_photo
             FROM action_figures af
-            WHERE af.name LIKE ? OR af.series LIKE ? OR af.manufacturer LIKE ?
-            ORDER BY af.name
-        ''', (search_term, search_term, search_term))
+            WHERE af.name LIKE ? OR af.series LIKE ? OR af.manufacturer LIKE ? OR af.wave LIKE ?
+            ORDER BY {db_column} {order}
+        ''', (search_term, search_term, search_term, search_term))
         
         figures = [dict(row) for row in cursor.fetchall()]
         conn.close()
@@ -334,11 +376,12 @@ class DatabaseManager:
         
         cursor.execute('''
             INSERT INTO wishlist 
-            (name, series, manufacturer, year, scale, target_price, priority, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (name, series, wave, manufacturer, year, scale, target_price, priority, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             item_data.get('name', ''),
             item_data.get('series', ''),
+            item_data.get('wave', ''),
             item_data.get('manufacturer', ''),
             item_data.get('year'),
             item_data.get('scale', ''),
@@ -371,12 +414,13 @@ class DatabaseManager:
         
         cursor.execute('''
             UPDATE wishlist 
-            SET name = ?, series = ?, manufacturer = ?, year = ?, scale = ?, 
+            SET name = ?, series = ?, wave = ?, manufacturer = ?, year = ?, scale = ?, 
                 target_price = ?, priority = ?, notes = ?, updated_at = ?
             WHERE id = ?
         ''', (
             item_data.get('name', ''),
             item_data.get('series', ''),
+            item_data.get('wave', ''),
             item_data.get('manufacturer', ''),
             item_data.get('year'),
             item_data.get('scale', ''),
