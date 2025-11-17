@@ -1645,8 +1645,6 @@ To restore:
         dialog = MergeCollectionsDialog(self)
         dialog.exec()
         
-        dialog.exec()
-        
     def update_status_bar(self):
         """Update the status bar with collection statistics."""
         stats = self.db.get_database_stats()

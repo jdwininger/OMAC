@@ -421,6 +421,8 @@ class MergeCollectionsDialog(QDialog):
         """Override accept to cleanup temp files."""
         self.cleanup_temp_files()
         super().accept()
+
+    def select_backup_file(self):
         """Select an OMAC backup ZIP file."""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select OMAC Backup", "",
