@@ -65,6 +65,7 @@ backups/
 # Build artifacts
 dist/
 build/
+tools/
 *.dmg
 OMAC.dmg
 

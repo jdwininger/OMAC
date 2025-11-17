@@ -13,9 +13,8 @@ A comprehensive desktop application for managing action figure collections with 
 - **Data Backup & Restore**: Create complete backups and restore from them
 - **Merge Collections**: Combine collections from other OMAC installations or CSV files
 - **Unique Menu Layout**: Traditional menu bar at the top with File, View, and Help menus
-- **Theme Support**: Switch between light and dark themes
 - **SQLite Database**: Reliable local database storage
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Cross-Platform**: Works on Windows, macOS, and Linux with platform-appropriate data storage
 
 ### Data Tracking
 - Figure name, series, and manufacturer
@@ -48,10 +47,12 @@ A comprehensive desktop application for managing action figure collections with 
 
 ## Requirements
 
-- Python 3.8 or higher
-- PyQt6
-- Pillow (for image processing)
-- SQLite (included with Python)
+- **Python 3.8 or higher**
+- **PyQt6** - GUI framework
+- **Pillow** - Image processing for photos
+- **SQLite** - Database (included with Python)
+- **py2app** - For building standalone macOS applications (optional, only needed for macOS builds)
+- **PyInstaller** - For building standalone Linux AppImages (automatically downloaded during Linux builds)
 
 ## Installation
 
@@ -73,59 +74,27 @@ A comprehensive desktop application for managing action figure collections with 
 
 3. **Install dependencies**
    ```bash
-      pip install -r requirements.txt
+   pip install -r requirements.txt
    ```
 
-## Building a Standalone macOS App
+4. **Run the application**
+   ```bash
+   python main.py
    ```
 
-### Cloud Backup Setup (Optional)
-
-OMAC supports backing up your collection to Google Drive for secure offsite storage.
-
-#### Quick Setup (Recommended)
-
-**Option 1: From OMAC Application**
-1. **Launch OMAC**
-2. **Go to File → Setup Google Drive**
-3. **Follow the step-by-step wizard**
-4. **Drag and drop your credentials.json file** or use the file selector
-
-**Option 2: Standalone Setup Script**
-1. **Run the setup script**: `python drive_setup.py`
-2. **Follow the wizard instructions**
-
-The setup wizard will:
-- Open the Google Cloud Console for you
-- Guide you through enabling the Drive API
-- Help you download and configure credentials
-- Test the connection automatically
-
-### Manual Setup (Advanced)
-
-If you prefer to set it up manually:
-
-1. **Google Cloud Console Setup**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing one
-   - Enable the Google Drive API
-   - Create OAuth 2.0 credentials for a desktop application
-   - Download the `credentials.json` file
-
-2. **Configure OMAC**
-   - Place `credentials.json` in the OMAC application directory
-   - First use will prompt for Google authentication
-   - Grant permission for OMAC to access Google Drive
-
-3. **Using Cloud Backup**
-   - File → "Backup to Cloud" - Creates and uploads a backup
-   - File → "Manage Cloud Backups" - View, download, or restore cloud backups
-   - **One-click restore**: Select a backup and click "Restore Backup" for automatic restoration
-   - **Download only**: Get backup files without restoring (for manual restoration)
+**First Run Notes:**
+- The application will create its data directory automatically based on your platform
+- Database and photo directories are created on first use
+- Manufacturer and location preferences are saved automatically
 
 ## Building a Standalone macOS App
 
 To create a standalone macOS application bundle that can be distributed to other users:
+
+### Prerequisites
+- macOS system (scripts include OS checks and will display an error on Linux/other systems)
+- Python virtual environment with dependencies installed
+- py2app (included in requirements.txt)
 
 ### Option 1: Build App Bundle + DMG (Recommended)
 ```bash
@@ -139,23 +108,52 @@ This creates both the application bundle and a compressed DMG file for distribut
 ```
 
 ### Distribution Files Created
-- **Application bundle**: `dist/OMAC.app` (274MB) - The runnable application
-- **Distributable DMG**: `OMAC.dmg` (113MB) - Compressed disk image for sharing
+- **Application bundle**: `dist/OMAC.app` (~274MB) - The runnable application
+- **Distributable DMG**: `OMAC.dmg` (~113MB) - Compressed disk image for sharing
 
 ### Usage
 - **Test locally**: Double-click `dist/OMAC.app`
 - **Distribute**: Share the `OMAC.dmg` file with other macOS users
 
 **Notes:**
+- Scripts include OS detection and will exit with an error message if run on Linux
 - The first run of the built app may take longer as it creates the database
 - The app bundle includes all necessary dependencies and is self-contained
 - Built apps are signed and ready for distribution
 - Compatible with macOS 10.15+ (argv_emulation disabled for modern macOS compatibility)
 - No Python installation required on target systems
 
-**Distribution Files:**
-- `dist/OMAC.app` - macOS application bundle
-- `OMAC.dmg` - Compressed disk image for easy distribution
+## Building a Standalone Linux AppImage
+
+To create a standalone Linux AppImage that can be distributed to other users:
+
+### Prerequisites
+- Linux system (scripts include OS checks and will display an error on macOS/other systems)
+- Python virtual environment with dependencies installed
+- Internet connection (for automatic PyInstaller and appimagetool download)
+
+### Build AppImage
+```bash
+./build_linux_appimage.sh
+```
+This creates a standalone AppImage file for distribution. The script will automatically download and install PyInstaller and appimagetool if they're not already available on your system.
+
+### Distribution Files Created
+- **AppImage**: `OMAC.AppImage` (~150MB) - Portable Linux application
+- **AppDir**: `AppDir/` - Application directory structure (if appimagetool not available)
+
+### Usage
+- **Make executable**: `chmod +x OMAC.AppImage`
+- **Test locally**: `./OMAC.AppImage`
+- **Distribute**: Share the `OMAC.AppImage` file with other Linux users
+
+**Notes:**
+- Scripts include OS detection and will exit with an error message if run on macOS
+- The script automatically downloads PyInstaller and appimagetool if not found (requires internet connection)
+- The first run may take longer as it creates the database in `~/Documents/OMAC/`
+- The AppImage includes all necessary dependencies and is self-contained
+- Compatible with most Linux distributions (Ubuntu, Fedora, etc.)
+- No Python installation required on target systems
 
 ## Usage
 
@@ -164,17 +162,35 @@ Run the application:
 python main.py
 ```
 
+**Data Storage Locations:**
+- **macOS**: `~/Library/Application Support/OMAC/`
+- **Linux**: `~/Documents/OMAC/`
+- **Windows/Other**: Current application directory
+
+The application automatically detects your operating system and stores data in the appropriate location.
+
 ## Project Structure
 
 ```
 OMAC/
-├── main.py              # Main application window and GUI
-├── database.py          # SQLite database manager
-├── merge_collections.py # Collection merging functionality
-├── requirements.txt     # Python dependencies
-├── action_figures.db    # SQLite database (created on first run)
-├── photos/              # Photo storage directory (created automatically)
-├── README.md           # This file
+├── main.py                    # Main application window and GUI
+├── database.py                # SQLite database manager
+├── merge_collections.py       # Collection merging functionality
+├── wishlist_dialog.py         # Wishlist management dialog
+├── quickstart.py              # Quick start utility
+├── manufacturers.txt          # Saved manufacturer list (created automatically)
+├── locations.txt              # Saved location list (created automatically)
+├── requirements.txt           # Python dependencies
+├── setup.py                   # Py2app configuration for macOS builds
+├── build_macos_app.sh         # Script to build macOS app bundle
+├── build_and_package_macos.sh # Script to build app bundle + DMG
+├── build_linux_appimage.sh    # Script to build Linux AppImage
+├── README.md                  # This file
+├── action_figures.db          # SQLite database (created on first run)
+├── photos/                    # Photo storage directory (created automatically)
+├── backups/                   # Backup storage directory (created automatically)
+├── build/                     # Build artifacts (created during macOS builds)
+├── tools/                     # Build tools directory (created automatically)
 └── .github/
     └── copilot-instructions.md
 ```
@@ -267,24 +283,31 @@ python main.py
 
 - **main.py**: PyQt6 GUI application with main window and dialogs
 - **database.py**: SQLite database operations and management
+- **wishlist_dialog.py**: Dedicated wishlist management interface
+- **Platform-Aware Storage**: Automatic data directory detection (macOS Application Support, Linux Documents, etc.)
 - **Object-Oriented Design**: Clean separation of UI and data layers
 - **Signal-Slot Pattern**: Qt's event handling for responsive UI
 
 ### Key Components
 
-1. **OMACMainWindow**: Main application window
-2. **ActionFigureDialog**: Add/edit dialog with tabbed interface
-3. **PhotoWidget**: Custom widget for photo display and interaction
-4. **DatabaseManager**: Complete SQLite database operations
+1. **OMACMainWindow**: Main application window with platform-aware data storage
+2. **ActionFigureDialog**: Add/edit dialog with tabbed interface and photo management
+3. **WishlistDialog**: Dedicated dialog for wishlist management and collection integration
+4. **PhotoWidget**: Custom widget for photo display and interaction
+5. **DatabaseManager**: Complete SQLite database operations
+6. **MergeCollectionsDialog**: Collection merging and import functionality
 
 ## Future Enhancements
 
-- **Export/Import**: Additional export formats beyond CSV
 - **Advanced Photo Viewer**: Full-screen image viewer with zoom and slideshow
-- **Statistics**: Advanced collection analytics and reporting
+- **Statistics Dashboard**: Advanced collection analytics and reporting
 - **Barcode Scanning**: UPC/EAN barcode support for quick entry
 - **Online Integration**: Price tracking and market value updates
 - **Custom Fields**: User-defined fields and categories
+- **Export Formats**: Additional export formats beyond CSV
+- **Cloud Backup**: Optional cloud storage integration
+- **Mobile Companion**: Web interface for mobile access
+- **Windows Portable App**: Standalone executable for Windows distribution
 
 ## Troubleshooting
 
@@ -296,9 +319,20 @@ python main.py
 
 ### Data Location
 
-- **Database**: `action_figures.db` in application directory
-- **Photos**: `photos/` subdirectory
-- **Backup recommended**: Copy both database and photos directory
+OMAC automatically stores your data in platform-appropriate locations:
+
+- **macOS**: `~/Library/Application Support/OMAC/`
+- **Linux**: `~/Documents/OMAC/`
+- **Windows/Other**: Current application directory
+
+**Data includes:**
+- `action_figures.db` - SQLite database
+- `photos/` - Photo storage directory
+- `backups/` - Backup files directory
+- `manufacturers.txt` - Saved manufacturer preferences
+- `locations.txt` - Saved location preferences
+
+**Backup recommended**: Copy the entire data directory to preserve all your collection data.
 
 ## License
 
