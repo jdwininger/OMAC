@@ -1,0 +1,15 @@
+# OMAC - One 'Mazing ActionFigure Catalog Requirements
+#
+# Core GUI Framework
+PyQt6>=6.6.0,<7.0.0          # Main GUI framework
+PyQt6-Qt6>=6.6.0,<7.0.0      # Qt6 libraries for PyQt6
+#
+# Image Processing
+Pillow>=9.0.0                 # Image processing and manipulation
+#
+# Build Tools
+py2app>=0.28.0                # macOS app bundling
+pyinstaller>=5.0.0            # Cross-platform executable bundling (Linux AppImage)
+packaging>=21.0               # Package versioning utilities
+setuptools>=65.0.0            # Build system requirements
+wheel>=0.37.0                 # Binary package format
