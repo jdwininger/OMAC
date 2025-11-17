@@ -42,6 +42,23 @@ class DatabaseManager:
             )
         ''')
         
+        # Create wishlist table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS wishlist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                series TEXT,
+                manufacturer TEXT,
+                year INTEGER,
+                scale TEXT,
+                target_price REAL,
+                priority TEXT DEFAULT 'medium',
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         # Create photos table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS photos (
@@ -58,6 +75,8 @@ class DatabaseManager:
         # Create indexes for better performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_figures_name ON action_figures(name)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_figures_series ON action_figures(series)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_wishlist_name ON wishlist(name)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_wishlist_series ON wishlist(series)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_photos_figure_id ON photos(figure_id)')
         
         conn.commit()
@@ -306,6 +325,94 @@ class DatabaseManager:
             'total_spent': total_spent,
             'total_value': total_spent  # Use total_spent for total_value
         }
+    
+    # Wishlist methods
+    def add_wishlist_item(self, item_data: Dict) -> int:
+        """Add a new item to the wishlist."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO wishlist 
+            (name, series, manufacturer, year, scale, target_price, priority, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            item_data.get('name', ''),
+            item_data.get('series', ''),
+            item_data.get('manufacturer', ''),
+            item_data.get('year'),
+            item_data.get('scale', ''),
+            item_data.get('target_price'),
+            item_data.get('priority', 'medium'),
+            item_data.get('notes', '')
+        ))
+        
+        item_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return item_id
+    
+    def get_all_wishlist_items(self) -> List[Dict]:
+        """Get all wishlist items."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT * FROM wishlist ORDER BY priority DESC, created_at DESC')
+        
+        items = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return items
+    
+    def update_wishlist_item(self, item_id: int, item_data: Dict) -> bool:
+        """Update a wishlist item."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            UPDATE wishlist 
+            SET name = ?, series = ?, manufacturer = ?, year = ?, scale = ?, 
+                target_price = ?, priority = ?, notes = ?, updated_at = ?
+            WHERE id = ?
+        ''', (
+            item_data.get('name', ''),
+            item_data.get('series', ''),
+            item_data.get('manufacturer', ''),
+            item_data.get('year'),
+            item_data.get('scale', ''),
+            item_data.get('target_price'),
+            item_data.get('priority', 'medium'),
+            item_data.get('notes', ''),
+            datetime.now().isoformat(),
+            item_id
+        ))
+        
+        success = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+        return success
+    
+    def delete_wishlist_item(self, item_id: int) -> bool:
+        """Delete a wishlist item."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM wishlist WHERE id = ?', (item_id,))
+        
+        success = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+        return success
+    
+    def move_wishlist_to_collection(self, wishlist_id: int, figure_data: Dict) -> int:
+        """Move a wishlist item to the main collection."""
+        # First add to main collection
+        figure_id = self.add_figure(figure_data)
+        
+        # Then remove from wishlist
+        self.delete_wishlist_item(wishlist_id)
+        
+        return figure_id
     
     def clear_all_data(self):
         """Clear all data from the database (for restore operations)."""

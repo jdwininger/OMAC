@@ -8,6 +8,12 @@ set -e  # Exit on any error
 echo "=== OMAC macOS App Builder ==="
 echo
 
+# Check if we're on Linux
+if [[ "$(uname -s)" == "Linux" ]]; then
+    echo "Error: This script is designed for macOS and cannot be run on Linux."
+    exit 1
+fi
+
 # Check if we're on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
     echo "Error: This build script is designed for macOS only."

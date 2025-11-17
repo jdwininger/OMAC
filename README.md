@@ -6,6 +6,7 @@ A comprehensive desktop application for managing action figure collections with 
 
 ### 🎯 Core Functionality
 - **Complete Collection Management**: Add, edit, delete, and organize your action figures
+- **Wishlist Management**: Track desired figures and easily move them to your collection when acquired
 - **Multi-Photo Support**: Upload and manage multiple photos per figure
 - **Advanced Search**: Find figures by name, series, or manufacturer
 - **Customizable Table View**: Show/hide columns and rearrange column order
@@ -30,6 +31,14 @@ A comprehensive desktop application for managing action figure collections with 
 - Photo gallery view
 - Automatic photo organization
 - Support for JPG, PNG, GIF, and BMP formats
+
+### 🎯 Wishlist Management
+- Track desired action figures you want to acquire
+- Add wishlist items with name, series, manufacturer, and target price
+- Set priority levels (Low, Medium, High) for wishlist items
+- Move items from wishlist to main collection when acquired
+- Dedicated wishlist dialog with full CRUD operations
+- Seamless integration with existing add figure workflow
 
 ### 🔍 Collection Overview
 - Table view with sortable columns
@@ -118,25 +127,24 @@ If you prefer to set it up manually:
 
 To create a standalone macOS application bundle that can be distributed to other users:
 
-1. **Ensure you have the build dependencies installed**
-   ```bash
-   pip install py2app
-   ```
+### Option 1: Build App Bundle + DMG (Recommended)
+```bash
+./build_and_package_macos.sh
+```
+This creates both the application bundle and a compressed DMG file for distribution.
 
-2. **Run the build script**
-   ```bash
-   ./build_macos_app.sh
-   ```
+### Option 2: Build App Bundle Only
+```bash
+./build_macos_app.sh
+```
 
-3. **Find the application bundle**
-   - The app will be created in `dist/OMAC.app` (274MB)
-   - Double-click to run it like any other macOS application
+### Distribution Files Created
+- **Application bundle**: `dist/OMAC.app` (274MB) - The runnable application
+- **Distributable DMG**: `OMAC.dmg` (113MB) - Compressed disk image for sharing
 
-4. **Optional: Create a distributable .dmg file**
-   ```bash
-   hdiutil create -volname 'OMAC' -srcfolder dist/OMAC.app -ov -format UDZO OMAC.dmg
-   ```
-   - Creates `OMAC.dmg` (113MB compressed)
+### Usage
+- **Test locally**: Double-click `dist/OMAC.app`
+- **Distribute**: Share the `OMAC.dmg` file with other macOS users
 
 **Notes:**
 - The first run of the built app may take longer as it creates the database

@@ -1057,6 +1057,27 @@ class OMACMainWindow(QMainWindow):
         """)
         sidebar_layout.addWidget(self.delete_button)
         
+        self.wishlist_button = QPushButton("Wishlist")
+        self.wishlist_button.clicked.connect(self.open_wishlist)
+        self.wishlist_button.setMinimumHeight(35)
+        self.wishlist_button.setStyleSheet("""
+            QPushButton {
+                background-color: #0078d4;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+                margin: 2px;
+            }
+            QPushButton:hover {
+                background-color: #106ebe;
+            }
+            QPushButton:pressed {
+                background-color: #005a9e;
+            }
+        """)
+        sidebar_layout.addWidget(self.wishlist_button)
+        
         sidebar_layout.addStretch()  # Push buttons to top
         sidebar_widget.setLayout(sidebar_layout)
         
@@ -1375,6 +1396,14 @@ class OMACMainWindow(QMainWindow):
                 self.status_bar.showMessage("Figure deleted successfully", 3000)
             else:
                 QMessageBox.warning(self, "Delete Error", "Could not delete figure.")
+                
+    def open_wishlist(self):
+        """Open the wishlist dialog."""
+        from wishlist_dialog import WishlistDialog
+        dialog = WishlistDialog(self)
+        dialog.exec()
+        # Refresh collection in case items were moved from wishlist
+        self.load_collection()
                 
     def export_database(self):
         """Create a complete backup of database and photos."""
