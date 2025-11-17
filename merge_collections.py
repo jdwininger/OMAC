@@ -113,11 +113,12 @@ class MergeWorker(QThread):
     finished = pyqtSignal(dict)  # results
     error = pyqtSignal(str)
 
-    def __init__(self, source_data: Dict, analysis: MergeAnalysis, options: Dict):
+    def __init__(self, source_data: Dict, analysis: MergeAnalysis, options: Dict, photos_dir: str = 'photos'):
         super().__init__()
         self.source_data = source_data
         self.analysis = analysis
         self.options = options
+        self.photos_dir = photos_dir
 
     def run(self):
         """Perform the merge operation."""
@@ -162,8 +163,8 @@ class MergeWorker(QThread):
             added_photos = 0
             self.progress.emit("Processing photos...", 60)
 
-            # Create photos directory if needed
-            photos_dir = "photos"
+            # Create photos directory if needed (use provided photos_dir)
+            photos_dir = self.photos_dir
             if not os.path.exists(photos_dir):
                 os.makedirs(photos_dir)
 
@@ -184,13 +185,10 @@ class MergeWorker(QThread):
 
                     if figure_id:
                         # Add to database
-                        photo_data = {
-                            'figure_id': figure_id,
-                            'file_path': dest_path,
-                            'caption': photo.get('caption', ''),
-                            'is_primary': photo.get('is_primary', False)
-                        }
-                        self.analysis.target_db.add_photo(photo_data)
+                        # Add to database with correct arguments
+                        self.analysis.target_db.add_photo(figure_id, dest_path,
+                                                          caption=photo.get('caption', ''),
+                                                          is_primary=bool(photo.get('is_primary', False)))
                         added_photos += 1
 
             self.progress.emit("Finalizing merge...", 90)
@@ -214,7 +212,7 @@ class MergeWorker(QThread):
         counter = 1
         candidate = filename
 
-        while os.path.exists(os.path.join("photos", candidate)):
+        while os.path.exists(os.path.join(self.photos_dir, candidate)):
             candidate = f"{base}_{counter}{ext}"
             counter += 1
 
@@ -273,23 +271,20 @@ class MergeWorker(QThread):
                 if 'file_path' in photo and os.path.exists(photo['file_path']):
                     # Copy the photo
                     final_filename = self._resolve_photo_filename(filename)
-                    dest_path = os.path.join("photos", final_filename)
+                    dest_path = os.path.join(self.photos_dir, final_filename)
                     shutil.copy2(photo['file_path'], dest_path)
                     
                     # Add to database
-                    photo_data = {
-                        'figure_id': figure_id,
-                        'file_path': dest_path,
-                        'caption': photo.get('caption', ''),
-                        'is_primary': photo.get('is_primary', False)
-                    }
-                    self.analysis.target_db.add_photo(photo_data)
+                    # Add to database with correct signature
+                    self.analysis.target_db.add_photo(figure_id, dest_path,
+                                                      caption=photo.get('caption', ''),
+                                                      is_primary=bool(photo.get('is_primary', False)))
 
 
 class MergeCollectionsDialog(QDialog):
     """Dialog for merging collections from another source."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, db=None, photos_dir: str = None):
         super().__init__(parent)
         self.setWindowTitle("Merge Collections")
         self.setModal(True)
@@ -299,6 +294,10 @@ class MergeCollectionsDialog(QDialog):
         self.analysis = None
         self.merge_worker = None
         self.temp_photo_dirs = []  # Track temp directories for cleanup
+        # Use provided db or parent's db for operations
+        self.target_db = db if db is not None else (parent.db if parent and hasattr(parent, 'db') else DatabaseManager())
+        # Default photos_dir to parent's photos_dir if available
+        self.photos_dir = photos_dir if photos_dir is not None else (parent.photos_dir if parent and hasattr(parent, 'photos_dir') else 'photos')
 
         self.init_ui()
 
@@ -450,6 +449,11 @@ class MergeCollectionsDialog(QDialog):
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Extract ZIP
                 with zipfile.ZipFile(zip_path, 'r') as zipf:
+                    # Prevent path traversal during extraction
+                    for member in zipf.infolist():
+                        member_path = member.filename
+                        if os.path.isabs(member_path) or member_path.startswith('..'):
+                            raise Exception("Unsafe paths in ZIP file")
                     zipf.extractall(temp_dir)
 
                 # Find CSV and TAR files
@@ -498,7 +502,17 @@ class MergeCollectionsDialog(QDialog):
                     os.makedirs(photo_temp_dir)
 
                     with tarfile.open(tar_file, "r:gz") as tar:
-                        tar.extractall(photo_temp_dir, filter='data')
+                        # Safe extraction to prevent path traversal attacks
+                        def is_within_directory(directory, target):
+                            abs_directory = os.path.abspath(directory)
+                            abs_target = os.path.abspath(target)
+                            return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
+
+                        for member in tar.getmembers():
+                            member_path = os.path.join(photo_temp_dir, member.name)
+                            if not is_within_directory(photo_temp_dir, member_path):
+                                raise Exception("Attempted Path Traversal in Tar File")
+                        tar.extractall(path=photo_temp_dir)
                     
                     # Create a persistent temp directory for photos that will survive the method
                     persistent_temp_dir = os.path.join(tempfile.gettempdir(), f'omac_backup_photos_{os.getpid()}')
@@ -608,7 +622,8 @@ class MergeCollectionsDialog(QDialog):
         if not self.source_data:
             return
 
-        self.analysis = MergeAnalysis(self.source_data, DatabaseManager())
+        # Use dialog's target_db which defaults to parent.db if available
+        self.analysis = MergeAnalysis(self.source_data, self.target_db)
         results = self.analysis.analyze()
 
         analysis_text = f"""📊 Merge Analysis Results:
@@ -664,7 +679,14 @@ Conflicts will be resolved according to your selected options."""
         self.progress_bar.setValue(0)
         self.merge_btn.setEnabled(False)
 
-        self.merge_worker = MergeWorker(self.source_data, self.analysis, options)
+        # Use parent's photos_dir if available so photos go to the right app folder
+        photos_dir = None
+        if self.parent() and hasattr(self.parent(), 'photos_dir'):
+            photos_dir = self.parent().photos_dir
+        else:
+            photos_dir = 'photos'
+
+        self.merge_worker = MergeWorker(self.source_data, self.analysis, options, photos_dir=photos_dir)
         self.merge_worker.progress.connect(self.update_progress)
         self.merge_worker.finished.connect(self.merge_finished)
         self.merge_worker.error.connect(self.merge_error)
@@ -693,8 +715,8 @@ Your collection has been updated."""
         QMessageBox.information(self, "Merge Complete", success_msg)
 
         # Refresh parent window if available
-        if hasattr(self.parent(), 'load_figures') and hasattr(self.parent(), 'update_status_bar'):
-            self.parent().load_figures()
+        if hasattr(self.parent(), 'load_collection') and hasattr(self.parent(), 'update_status_bar'):
+            self.parent().load_collection()
             self.parent().update_status_bar()
 
         # Reset dialog

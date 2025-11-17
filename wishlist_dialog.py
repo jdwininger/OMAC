@@ -21,13 +21,14 @@ class WishlistDialog(QDialog):
 
     item_moved_to_collection = pyqtSignal(dict)  # Emitted when item is moved to collection
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, db=None):
         super().__init__(parent)
         self.setWindowTitle("Wishlist Management")
         self.setModal(True)
         self.resize(1000, 700)
 
-        self.db = DatabaseManager()
+        # Use provided db instance or parent's db if available. Fall back to DatabaseManager.
+        self.db = db if db is not None else (parent.db if parent and hasattr(parent, 'db') else DatabaseManager())
         self.current_item_id = None
 
         self.init_ui()

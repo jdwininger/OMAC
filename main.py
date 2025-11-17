@@ -604,7 +604,7 @@ class OMACMainWindow(QMainWindow):
         settings = QSettings("OMAC", "ActionFigureCatalog")
         
         # Default column width percentages if no settings exist
-        default_percentages = [30.0, 20.0, 20.0, 10.0, 15.0, 5.0]  # Name, Series, Manufacturer, Year, Condition, Photos
+        default_percentages = [30.0, 20.0, 10.0, 15.0, 5.0, 10.0, 10.0]  # Name, Series, Wave, Manufacturer, Year, Condition, Photos
         
         # Load saved percentages
         saved_percentages = []
@@ -641,7 +641,7 @@ class OMACMainWindow(QMainWindow):
                     self.collection_table.setColumnWidth(col, width)
         else:
             # Fall back to default absolute widths
-            default_widths = [200, 150, 150, 80, 120, 80]
+            default_widths = [250, 150, 120, 150, 80, 120, 100]
             for col in range(self.collection_table.columnCount()):
                 width = default_widths[col] if col < len(default_widths) else 100
                 self.collection_table.setColumnWidth(col, width)
@@ -845,39 +845,7 @@ class OMACMainWindow(QMainWindow):
         # Load column widths (existing functionality)
         self.load_column_widths()
     
-    def load_column_widths(self):
-        """Load saved column widths."""
-        settings = QSettings("OMAC", "ActionFigureCatalog")
-        
-        # Check if we have saved percentage data
-        has_percentage_data = any(settings.value(f"column_percentage_{col}") is not None 
-                                for col in range(self.collection_table.columnCount()))
-        
-        if has_percentage_data:
-            # Load saved percentages and apply widths
-            saved_percentages = []
-            for col in range(self.collection_table.columnCount()):
-                percentage_value = settings.value(f"column_percentage_{col}")
-                if percentage_value is not None:
-                    try:
-                        percentage = float(percentage_value)
-                        if 0 <= percentage <= 100:
-                            saved_percentages.append(percentage)
-                        else:
-                            saved_percentages.append(10.0)  # fallback
-                    except (ValueError, TypeError):
-                        saved_percentages.append(10.0)  # fallback
-                else:
-                    saved_percentages.append(10.0)  # fallback
-            
-            # Get available width for columns
-            viewport_width = self.collection_table.viewport().width()
-            if viewport_width > 0:
-                # Calculate and set column widths based on percentages
-                for col, percentage in enumerate(saved_percentages):
-                    width = int((percentage / 100.0) * viewport_width)
-                    if width > 0:
-                        self.collection_table.setColumnWidth(col, width)
+    # Duplicate load_column_widths definition removed to avoid conflicts; functionality is defined above.
     
     def create_menu_bar(self):
         """Create the application menu bar."""
@@ -1492,7 +1460,7 @@ class OMACMainWindow(QMainWindow):
     def open_wishlist(self):
         """Open the wishlist dialog."""
         from wishlist_dialog import WishlistDialog
-        dialog = WishlistDialog(self)
+        dialog = WishlistDialog(self, db=self.db)
         dialog.exec()
         # Refresh collection in case items were moved from wishlist
         self.load_collection()
@@ -1668,6 +1636,10 @@ To restore:
             progress.setLabelText("Extracting backup...")
             with tempfile.TemporaryDirectory() as temp_dir:
                 with zipfile.ZipFile(backup_file, 'r') as zipf:
+                    for member in zipf.infolist():
+                        member_name = member.filename
+                        if os.path.isabs(member_name) or member_name.startswith('..'):
+                            raise Exception("Unsafe paths in ZIP file")
                     zipf.extractall(temp_dir)
                 
                 # Find the extracted files
@@ -1733,9 +1705,18 @@ To restore:
                         shutil.rmtree(self.photos_dir)
                     os.makedirs(self.photos_dir)
                     
-                    # Extract photos
+                    # Extract photos safely
                     with tarfile.open(tar_file, "r:gz") as tar:
-                        tar.extractall(self.data_dir, filter='data')
+                        def is_within_directory(directory, target):
+                            abs_directory = os.path.abspath(directory)
+                            abs_target = os.path.abspath(target)
+                            return os.path.commonpath([abs_directory]) == os.path.commonpath([abs_directory, abs_target])
+
+                        for member in tar.getmembers():
+                            member_path = os.path.join(self.photos_dir, member.name)
+                            if not is_within_directory(self.photos_dir, member_path):
+                                raise Exception("Attempted Path Traversal in Tar File")
+                        tar.extractall(path=self.photos_dir)
                 
                 progress.setValue(4)
                 if progress.wasCanceled():
@@ -1743,7 +1724,7 @@ To restore:
                 
                 # Step 5: Refresh UI
                 progress.setLabelText("Refreshing display...")
-                self.load_figures()
+                self.load_collection()
                 self.update_status_bar()
                 
                 progress.setValue(5)
@@ -1764,7 +1745,7 @@ To restore:
     def merge_collections(self):
         """Merge data from another collection into the current one."""
         from merge_collections import MergeCollectionsDialog
-        dialog = MergeCollectionsDialog(self)
+        dialog = MergeCollectionsDialog(self, db=self.db, photos_dir=self.photos_dir)
         dialog.exec()
         
     def update_status_bar(self):

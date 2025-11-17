@@ -13,3 +13,4 @@ pyinstaller>=5.0.0            # Cross-platform executable bundling (Linux AppIma
 packaging>=21.0               # Package versioning utilities
 setuptools>=65.0.0            # Build system requirements
 wheel>=0.37.0                 # Binary package format
+pytest>=7.0.0                 # For running unit tests in development
