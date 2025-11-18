@@ -1,4 +1,4 @@
-# OMAC - One 'Mazing ActionFigure Catalog Requirements
+# OMAC - One 'Mazing Action Catalog Requirements
 #
 # Core GUI Framework
 PyQt6>=6.6.0,<7.0.0          # Main GUI framework

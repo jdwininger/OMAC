@@ -1,5 +1,5 @@
 """
-Quickstart script for OMAC - One 'Mazing ActionFigure Catalog
+Quickstart script for OMAC - One 'Mazing Action Catalog
 
 Sets up the Python virtual environment, installs dependencies, and launches the application.
 """

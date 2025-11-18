@@ -1,4 +1,4 @@
-# OMAC - One 'Mazing ActionFigure Catalog
+# OMAC - One 'Mazing Action Catalog
 
 A comprehensive desktop application for managing action figure collections with photo support, built with Python and PyQt6.
 

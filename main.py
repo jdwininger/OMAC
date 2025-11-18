@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-OMAC - One 'Mazing ActionFigure Catalog
+OMAC - One 'Mazing Action Catalog
 
 A PyQt6-based desktop application for managing action figure collections
 with SQLite database backend and photo management.
@@ -542,7 +542,7 @@ class ActionFigureDialog(QDialog):
 
 
 class OMACMainWindow(QMainWindow):
-    """Main application window for OMAC - One 'Mazing ActionFigure Catalog."""
+    """Main application window for OMAC - One 'Mazing Action Catalog."""
     
     def __init__(self):
         super().__init__()
@@ -585,7 +585,7 @@ class OMACMainWindow(QMainWindow):
         
     def init_ui(self):
         """Initialize the user interface."""
-        self.setWindowTitle("OMAC - One 'Mazing ActionFigure Catalog")
+        self.setWindowTitle("OMAC - One 'Mazing Action Catalog")
         self.setGeometry(100, 100, 1200, 800)
         
         # Create menu bar
@@ -1719,7 +1719,7 @@ To restore:
         QMessageBox.about(
             self,
             "About OMAC",
-            "OMAC - One 'Mazing ActionFigure Catalog\n\n"
+            "OMAC - One 'Mazing Action Catalog\n\n"
             "A comprehensive database application for managing\n"
             "action figure collections with photo support.\n\n"
             "Built with Python and PyQt6\n"

@@ -1,5 +1,5 @@
 """
-Database manager for OMAC - One 'Mazing ActionFigure Catalog.
+Database manager for OMAC - One 'Mazing Action Catalog.
 
 Handles SQLite database operations for storing action figure data and photos.
 """
