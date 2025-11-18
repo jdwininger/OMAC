@@ -220,6 +220,7 @@ AppDir/
 
 # Project-specific: Build artifacts and backups
 backups/
+backup/
 
 # Image files
 *.png
