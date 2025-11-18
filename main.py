@@ -106,6 +106,186 @@ class PhotoWidget(QLabel):
         super().mousePressEvent(event)
 
 
+class TagInputWidget(QWidget):
+    """Custom widget for tag input with bubble display."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.tags = []
+        self.init_ui()
+
+    def init_ui(self):
+        """Initialize the tag input UI."""
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)
+
+        # Tag display area
+        self.tags_layout = QHBoxLayout()
+        self.tags_layout.setSpacing(5)
+        self.tags_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Scroll area for tags
+        self.tags_scroll = QScrollArea()
+        self.tags_scroll.setWidgetResizable(True)
+        self.tags_scroll.setMaximumHeight(60)
+        self.tags_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.tags_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.tags_container = QWidget()
+        self.tags_container.setLayout(self.tags_layout)
+        self.tags_scroll.setWidget(self.tags_container)
+
+        # Input field for new tags
+        self.tag_input = QLineEdit()
+        self.tag_input.setPlaceholderText("Add a tag... (press Enter or comma to add)")
+        self.tag_input.returnPressed.connect(self.add_tag_from_input)
+        self.tag_input.textChanged.connect(self.handle_text_changed)
+
+        layout.addWidget(self.tags_scroll)
+        layout.addWidget(self.tag_input)
+
+    def add_tag_from_input(self):
+        """Add a tag from the input field."""
+        text = self.tag_input.text().strip()
+        if text and text not in self.tags:
+            self.add_tag(text)
+            self.tag_input.clear()
+
+    def handle_text_changed(self, text):
+        """Handle text changes in the input field."""
+        if ',' in text:
+            # Split by comma and add each tag
+            parts = text.split(',')
+            for part in parts[:-1]:  # All parts except the last one
+                tag = part.strip()
+                if tag and tag not in self.tags:
+                    self.add_tag(tag)
+            # Keep the remaining text in the input
+            self.tag_input.setText(parts[-1].strip())
+
+    def add_tag(self, tag_text):
+        """Add a tag to the display."""
+        if tag_text in self.tags:
+            return
+
+        self.tags.append(tag_text)
+
+        # Create tag bubble
+        tag_widget = self.create_tag_bubble(tag_text)
+        self.tags_layout.addWidget(tag_widget)
+
+    def create_tag_bubble(self, tag_text):
+        """Create a tag bubble widget."""
+        # Create a frame for the tag
+        tag_frame = QFrame()
+        tag_frame.setFrameStyle(QFrame.Shape.Box)
+        tag_frame.setLineWidth(1)
+
+        # Get theme colors
+        app = QApplication.instance()
+        if app:
+            palette = app.palette()
+            bg_color = palette.color(QPalette.ColorRole.Highlight)
+            text_color = palette.color(QPalette.ColorRole.HighlightedText)
+        else:
+            bg_color = QColor(51, 153, 255)
+            text_color = QColor(255, 255, 255)
+
+        # Style the tag
+        tag_frame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {bg_color.name()};
+                border: 1px solid {bg_color.darker(120).name()};
+                border-radius: 10px;
+                padding: 2px 6px;
+                margin: 2px;
+            }}
+        """)
+
+        # Layout for tag content
+        tag_layout = QHBoxLayout(tag_frame)
+        tag_layout.setContentsMargins(4, 2, 4, 2)
+        tag_layout.setSpacing(4)
+
+        # Tag text
+        tag_label = QLabel(tag_text)
+        tag_label.setStyleSheet(f"color: {text_color.name()}; border: none; font-size: 11px;")
+        tag_layout.addWidget(tag_label)
+
+        # Remove button
+        remove_btn = QPushButton("×")
+        remove_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {text_color.name()};
+                background: transparent;
+                border: none;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 0px 2px;
+                margin: 0px;
+            }}
+            QPushButton:hover {{
+                color: {bg_color.lighter(150).name()};
+            }}
+        """)
+        remove_btn.setFixedSize(16, 16)
+        remove_btn.clicked.connect(lambda: self.remove_tag(tag_text))
+        tag_layout.addWidget(remove_btn)
+
+        return tag_frame
+
+    def remove_tag(self, tag_text):
+        """Remove a tag."""
+        if tag_text in self.tags:
+            self.tags.remove(tag_text)
+
+            # Remove the widget from layout
+            for i in range(self.tags_layout.count()):
+                item = self.tags_layout.itemAt(i)
+                if item and item.widget():
+                    widget = item.widget()
+                    # Check if this is the tag we want to remove
+                    if hasattr(widget, 'layout') and widget.layout():
+                        layout = widget.layout()
+                        for j in range(layout.count()):
+                            sub_item = layout.itemAt(j)
+                            if sub_item and sub_item.widget() and isinstance(sub_item.widget(), QLabel):
+                                if sub_item.widget().text() == tag_text:
+                                    widget.setParent(None)
+                                    widget.deleteLater()
+                                    return
+
+    def get_tags(self):
+        """Get the current tags as a list."""
+        return self.tags.copy()
+
+    def set_tags(self, tags):
+        """Set the tags from a list."""
+        # Clear existing tags
+        self.clear_tags()
+
+        # Add new tags
+        for tag in tags:
+            if tag.strip():
+                self.add_tag(tag.strip())
+
+    def clear_tags(self):
+        """Clear all tags."""
+        self.tags.clear()
+
+        # Remove all tag widgets
+        while self.tags_layout.count():
+            item = self.tags_layout.takeAt(0)
+            if item and item.widget():
+                item.widget().setParent(None)
+                item.widget().deleteLater()
+
+    def get_tags_as_string(self):
+        """Get tags as comma-separated string for storage."""
+        return ", ".join(self.tags)
+
+
 class ActionFigureDialog(QDialog):
     """Dialog for adding/editing action figure entries."""
     
@@ -235,8 +415,7 @@ class ActionFigureDialog(QDialog):
         self.add_location_btn.setFixedWidth(145)
         self.add_location_btn.clicked.connect(self.add_location)
 
-        self.notes_edit = QTextEdit()
-        self.notes_edit.setFixedHeight(80)
+        self.notes_edit = TagInputWidget()
         self.notes_edit.setFixedWidth(input_width)
 
         # Create labels with consistent styling and left alignment
@@ -330,11 +509,22 @@ class ActionFigureDialog(QDialog):
         row += 1
 
         # Notes field
-        notes_label = QLabel("Notes:")
+        notes_label = QLabel("Tags:")
         notes_label.setStyleSheet(label_style)
         notes_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         details_layout.addWidget(notes_label, row, 0, Qt.AlignmentFlag.AlignTop)
         details_layout.addWidget(self.notes_edit, row, 1, Qt.AlignmentFlag.AlignLeft)
+        row += 1
+
+        # Popular tags section
+        popular_tags_label = QLabel("Popular Tags:")
+        popular_tags_label.setStyleSheet(label_style)
+        popular_tags_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        details_layout.addWidget(popular_tags_label, row, 0, Qt.AlignmentFlag.AlignTop)
+
+        # Create popular tags widget
+        self.popular_tags_widget = self.create_popular_tags_widget()
+        details_layout.addWidget(self.popular_tags_widget, row, 1, Qt.AlignmentFlag.AlignLeft)
         row += 1
         
         details_tab.setLayout(details_layout)
@@ -416,7 +606,15 @@ class ActionFigureDialog(QDialog):
             self.purchase_price_spin.setValue(float(self.figure_data['purchase_price']))
             
         self.location_combo.setCurrentText(self.figure_data.get('location', ''))
-        self.notes_edit.setText(self.figure_data.get('notes', ''))
+        
+        # Handle tags (notes field now contains comma-separated tags)
+        notes_text = self.figure_data.get('notes', '')
+        if notes_text:
+            # Split by comma and clean up whitespace
+            tags = [tag.strip() for tag in notes_text.split(',') if tag.strip()]
+            self.notes_edit.set_tags(tags)
+        else:
+            self.notes_edit.clear_tags()
         
         # Load existing photos if editing
         if self.is_edit_mode and hasattr(self, 'parent') and hasattr(self.parent(), 'db'):
@@ -471,7 +669,7 @@ class ActionFigureDialog(QDialog):
             'condition': self.condition_combo.currentText(),
             'purchase_price': self.purchase_price_spin.value() if self.purchase_price_spin.value() > 0 else None,
             'location': self.location_combo.currentText().strip(),
-            'notes': self.notes_edit.toPlainText().strip()
+            'notes': self.notes_edit.get_tags_as_string()
         }
     
     def accept(self):
@@ -542,6 +740,91 @@ class ActionFigureDialog(QDialog):
             else:
                 # Select existing item
                 self.location_combo.setCurrentText(location_name)
+
+    def get_popular_tags(self):
+        """Get the most popular tags from existing figures."""
+        if not hasattr(self, 'parent') or not hasattr(self.parent(), 'db'):
+            return []
+
+        try:
+            # Get all figures and extract tags from notes field
+            figures = self.parent().db.get_all_figures()
+            tag_counts = {}
+
+            for figure in figures:
+                notes = figure.get('notes', '')
+                if notes:
+                    # Split by comma and count each tag
+                    tags = [tag.strip() for tag in notes.split(',') if tag.strip()]
+                    for tag in tags:
+                        tag_counts[tag] = tag_counts.get(tag, 0) + 1
+
+            # Sort by frequency and return top 10
+            sorted_tags = sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)
+            return [tag for tag, count in sorted_tags[:10]]
+
+        except Exception:
+            return []
+
+    def create_popular_tags_widget(self):
+        """Create a widget displaying popular tags."""
+        popular_tags = self.get_popular_tags()
+
+        if not popular_tags:
+            no_tags_label = QLabel("No tags found yet")
+            no_tags_label.setStyleSheet("color: #6c757d; font-style: italic;")
+            return no_tags_label
+
+        # Create a widget to hold the popular tags
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)
+
+        # Create flow layout for tags
+        tags_layout = QHBoxLayout()
+        tags_layout.setSpacing(5)
+        tags_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Scroll area for popular tags
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setMaximumHeight(40)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        tags_container = QWidget()
+        tags_container.setLayout(tags_layout)
+        scroll_area.setWidget(tags_container)
+
+        # Add popular tags as clickable buttons
+        for tag in popular_tags:
+            tag_btn = QPushButton(tag)
+            tag_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #e9ecef;
+                    border: 1px solid #ced4da;
+                    border-radius: 12px;
+                    padding: 4px 8px;
+                    font-size: 10px;
+                    color: #495057;
+                }
+                QPushButton:hover {
+                    background-color: #dee2e6;
+                    border-color: #adb5bd;
+                }
+            """)
+            tag_btn.clicked.connect(lambda checked, t=tag: self.add_popular_tag(t))
+            tags_layout.addWidget(tag_btn)
+
+        layout.addWidget(scroll_area)
+        return container
+
+    def add_popular_tag(self, tag):
+        """Add a popular tag to the current tags."""
+        current_tags = self.notes_edit.get_tags()
+        if tag not in current_tags:
+            self.notes_edit.add_tag(tag)
 
 
 class OMACMainWindow(QMainWindow):
@@ -1435,6 +1718,16 @@ class OMACMainWindow(QMainWindow):
         else:
             purchase_price_str = f"${purchase_price:.2f}"
 
+        # Handle tags display
+        notes_text = figure.get('notes', '')
+        if notes_text:
+            # Parse tags from comma-separated string
+            tags = [tag.strip() for tag in notes_text.split(',') if tag.strip()]
+            tags_html = self.create_tags_html(tags)
+            tags_display = f"<p><b>Tags:</b></p>{tags_html}"
+        else:
+            tags_display = "<p><b>Tags:</b> None</p>"
+
         details_text = f"""
         <h3>{figure.get('name', 'Unknown')}</h3>
         <p><b>Series:</b> {figure.get('series', 'N/A')}</p>
@@ -1444,7 +1737,7 @@ class OMACMainWindow(QMainWindow):
         <p><b>Condition:</b> {figure.get('condition', 'N/A')}</p>
         <p><b>Purchase Price:</b> {purchase_price_str}</p>
         <p><b>Location:</b> {figure.get('location', 'N/A')}</p>
-        <p><b>Notes:</b> {figure.get('notes', 'None')}</p>
+        {tags_display}
         """
         
         self.details_label.setText(details_text)
@@ -1491,6 +1784,40 @@ class OMACMainWindow(QMainWindow):
         """View a photo in full size."""
         viewer = ImageViewerDialog(file_path, self)
         viewer.exec()
+        
+    def create_tags_html(self, tags):
+        """Create HTML for displaying tags as bubbles."""
+        if not tags:
+            return ""
+        
+        # Get theme colors for styling
+        app = QApplication.instance()
+        if app:
+            palette = app.palette()
+            bg_color = palette.color(QPalette.ColorRole.Highlight).name()
+            text_color = palette.color(QPalette.ColorRole.HighlightedText).name()
+        else:
+            bg_color = "#0078d4"
+            text_color = "#ffffff"
+        
+        tag_html_parts = []
+        for tag in tags:
+            tag_html = f"""
+            <span style="
+                display: inline-block;
+                background-color: {bg_color};
+                color: {text_color};
+                border-radius: 12px;
+                padding: 4px 8px;
+                margin: 2px 4px 2px 0px;
+                font-size: 11px;
+                font-weight: normal;
+                border: 1px solid {bg_color};
+            ">{tag}</span>
+            """
+            tag_html_parts.append(tag_html)
+        
+        return "".join(tag_html_parts)
         
     def add_figure(self):
         """Add a new action figure."""
