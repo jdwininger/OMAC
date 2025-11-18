@@ -23,15 +23,19 @@ class CollectionView:
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
         
-        # Set column resize modes
+        # Set column resize modes - make all columns interactively resizable
         header = self.table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)  # Name
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)  # Series
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)  # Wave
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)  # Manufacturer
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)  # Year
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)  # Condition
-        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)  # Photos
+        for i in range(len(headers)):
+            header.setSectionResizeMode(i, QHeaderView.ResizeMode.Interactive)
+        
+        # Set reasonable default widths
+        header.resizeSection(0, 200)  # Name
+        header.resizeSection(1, 150)  # Series
+        header.resizeSection(2, 100)  # Wave
+        header.resizeSection(3, 150)  # Manufacturer
+        header.resizeSection(4, 80)   # Year
+        header.resizeSection(5, 120)  # Condition
+        header.resizeSection(6, 80)   # Photos
     
     def load_figures(self, figures: List[Dict]) -> None:
         """

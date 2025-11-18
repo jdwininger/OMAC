@@ -11,6 +11,7 @@ A comprehensive desktop application for managing action figure collections with 
 - **Advanced Search**: Find figures by name, series, or manufacturer
 - **Column Sorting**: Click any column header to sort ascending/descending (Name, Series, Wave, Manufacturer, Year, Condition, Photos)
 - **Customizable Table View**: Show/hide columns and rearrange column order
+- **Dark/Light Theme Support**: Switch between light, dark, and Dracula themes via View menu
 - **Data Backup & Restore**: Create complete backups and restore from them
 - **Merge Collections**: Combine collections from other OMAC installations or CSV files
 - **Unique Menu Layout**: Traditional menu bar at the top with File, View, and Help menus
@@ -254,7 +255,8 @@ OMAC/
 ├── main.py                    # Main application window and GUI
 ├── database.py                # SQLite database manager
 ├── photo_manager.py           # Photo management utilities (refactored from main.py)
-├── collection_view.py         # Collection table view management (refactored from main.py)
+├── collection_view.py         # Collection table view management (resizable columns)
+├── theme_manager.py           # Theme management (light/dark/Dracula modes)
 ├── merge_collections.py       # Collection merging functionality
 ├── wishlist_dialog.py         # Wishlist management dialog
 ├── quickstart.py              # Quick start utility
@@ -352,7 +354,8 @@ OMAC/
 - **Restore**: Restore from backup via File → Restore Database & Photos menu
 - **Column Management**: Right-click table headers to show/hide columns and reset layout
 - **Column Reordering**: Drag column headers to rearrange column order
-- **Theme**: Switch between light and dark themes via View menu
+- **Column Resizing**: Drag column borders to adjust column widths (widths are saved automatically)
+- **Theme**: Switch between light, dark, and Dracula themes via View → Theme menu
 
 ### Photo Features
 

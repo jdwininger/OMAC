@@ -34,6 +34,7 @@ from database import DatabaseManager
 from merge_collections import MergeCollectionsDialog
 from photo_manager import PhotoManager
 from collection_view import CollectionView
+from theme_manager import ThemeManager
 
 
 class ImageViewerDialog(QDialog):
@@ -569,6 +570,9 @@ class OMACMainWindow(QMainWindow):
         self.photo_manager = PhotoManager(self.photos_dir)
         self.current_figure_id = None
         
+        # Initialize theme manager
+        self.theme_manager = ThemeManager()
+        
         # Sorting state
         self.sort_column = 'name'  # Default sort column
         self.sort_order = 'ASC'    # Default sort order
@@ -582,6 +586,9 @@ class OMACMainWindow(QMainWindow):
         
         # Load saved column settings (visibility, order, widths)
         self.load_column_settings()
+        
+        # Load and apply saved theme
+        self.load_theme_preference()
         
     def init_ui(self):
         """Initialize the user interface."""
@@ -927,6 +934,22 @@ class OMACMainWindow(QMainWindow):
         refresh_action.setShortcut('F5')
         refresh_action.triggered.connect(self.load_collection)
         self.view_menu.addAction(refresh_action)
+        
+        # Theme submenu
+        self.view_menu.addSeparator()
+        theme_menu = self.view_menu.addMenu('&Theme')
+        
+        light_theme_action = QAction('&Light Theme', self)
+        light_theme_action.triggered.connect(self.switch_to_light_theme)
+        theme_menu.addAction(light_theme_action)
+        
+        dark_theme_action = QAction('&Dark Theme', self)
+        dark_theme_action.triggered.connect(self.switch_to_dark_theme)
+        theme_menu.addAction(dark_theme_action)
+        
+        dracula_theme_action = QAction('&Dracula Theme', self)
+        dracula_theme_action.triggered.connect(self.switch_to_dracula_theme)
+        theme_menu.addAction(dracula_theme_action)
         
         # Help menu button
         self.help_menu_button = QPushButton("Help")
@@ -1725,6 +1748,36 @@ To restore:
             "Built with Python and PyQt6\n"
             "Database: SQLite"
         )
+
+    def load_theme_preference(self):
+        """Load and apply the saved theme preference."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        theme = settings.value("theme", ThemeManager.LIGHT_THEME)
+        try:
+            self.theme_manager.set_theme(theme)
+        except ValueError:
+            # Fallback to light theme if invalid theme is saved
+            self.theme_manager.set_theme(ThemeManager.LIGHT_THEME)
+
+    def save_theme_preference(self):
+        """Save the current theme preference."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        settings.setValue("theme", self.theme_manager.get_current_theme())
+
+    def switch_to_light_theme(self):
+        """Switch to light theme."""
+        self.theme_manager.set_theme(ThemeManager.LIGHT_THEME)
+        self.save_theme_preference()
+
+    def switch_to_dark_theme(self):
+        """Switch to dark theme."""
+        self.theme_manager.set_theme(ThemeManager.DARK_THEME)
+        self.save_theme_preference()
+
+    def switch_to_dracula_theme(self):
+        """Switch to Dracula theme."""
+        self.theme_manager.set_theme(ThemeManager.DRACULA_THEME)
+        self.save_theme_preference()
 
 
 def main():
