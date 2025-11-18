@@ -858,13 +858,9 @@ class OMACMainWindow(QMainWindow):
         """Create the application menu bar."""
         # Create custom menu bar widget for cross-platform compatibility
         self.menubar = QWidget()
+        self.menubar.setObjectName("menubar")  # For theme-specific styling
         self.menubar.setFixedHeight(25)
-        self.menubar.setStyleSheet("""
-            QWidget {
-                background-color: palette(window);
-                border-bottom: 1px solid palette(dark);
-            }
-        """)
+        # Note: Styling is now handled by theme_manager.get_theme_stylesheet()
         
         menubar_layout = QHBoxLayout()
         menubar_layout.setContentsMargins(5, 0, 5, 0)

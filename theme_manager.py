@@ -100,14 +100,15 @@ class ThemeManager:
         # Foreground: #f8f8f2
         # Purple: #bd93f9
         # Cyan: #8be9fd
+        # Comment: #6272a4
 
-        # Window colors - Dracula background
-        palette.setColor(QPalette.ColorRole.Window, QColor(40, 42, 54))  # #282a36
+        # Window colors - Dracula background (slightly lighter for better contrast)
+        palette.setColor(QPalette.ColorRole.Window, QColor(46, 49, 62))  # Slightly lighter #282a36
         palette.setColor(QPalette.ColorRole.WindowText, QColor(248, 248, 242))  # #f8f8f2
 
         # Base colors - Dracula current line for input fields
         palette.setColor(QPalette.ColorRole.Base, QColor(68, 71, 90))  # #44475a
-        palette.setColor(QPalette.ColorRole.AlternateBase, QColor(40, 42, 54))  # #282a36
+        palette.setColor(QPalette.ColorRole.AlternateBase, QColor(46, 49, 62))  # #282a36
 
         # Text colors - Dracula foreground
         palette.setColor(QPalette.ColorRole.Text, QColor(248, 248, 242))  # #f8f8f2
@@ -119,7 +120,7 @@ class ThemeManager:
 
         # Highlight colors - Dracula purple selection
         palette.setColor(QPalette.ColorRole.Highlight, QColor(189, 147, 249))  # #bd93f9
-        palette.setColor(QPalette.ColorRole.HighlightedText, QColor(40, 42, 54))  # #282a36
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor(46, 49, 62))  # #282a36
 
         # Links - Dracula cyan
         palette.setColor(QPalette.ColorRole.Link, QColor(139, 233, 253))  # #8be9fd
@@ -137,6 +138,8 @@ class ThemeManager:
             app = QApplication.instance()
             if app:
                 app.setPalette(self.themes[theme_name])
+                # Apply theme-specific stylesheet
+                app.setStyleSheet(self.get_theme_stylesheet())
                 # Force a style update for all widgets
                 for widget in app.allWidgets():
                     widget.update()
@@ -151,6 +154,46 @@ class ThemeManager:
         """Get list of available theme names."""
         return list(self.themes.keys())
 
-    def is_dark_theme(self):
-        """Check if current theme is dark."""
-        return self.current_theme in [self.DARK_THEME, self.DRACULA_THEME]
+    def get_theme_stylesheet(self):
+        """Get theme-specific CSS styles."""
+        if self.current_theme == self.DRACULA_THEME:
+            return """
+                /* Dracula theme specific styles */
+                QWidget#menubar {
+                    background-color: #44475a;
+                    border-bottom: 1px solid #6272a4;
+                }
+                
+                QLabel {
+                    color: #f8f8f2;
+                }
+                
+                /* Ensure search label is visible */
+                QLabel[style*="font-weight: bold"] {
+                    color: #f8f8f2;
+                }
+            """
+        elif self.current_theme == self.DARK_THEME:
+            return """
+                /* Dark theme specific styles */
+                QWidget#menubar {
+                    background-color: #2d2d2d;
+                    border-bottom: 1px solid #555555;
+                }
+                
+                QLabel {
+                    color: #dcdcdc;
+                }
+            """
+        else:  # Light theme
+            return """
+                /* Light theme specific styles */
+                QWidget#menubar {
+                    background-color: #f0f0f0;
+                    border-bottom: 1px solid #cccccc;
+                }
+                
+                QLabel {
+                    color: #000000;
+                }
+            """
