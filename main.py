@@ -1856,26 +1856,42 @@ class OMACMainWindow(QMainWindow):
                 success = self.db.update_figure(self.current_figure_id, form_data)
                 
                 if success:
-                    # Handle photos - delete existing photos and add new ones
-                    # First, get existing photos
+                    # Handle photos
+                    # Get existing photos from database
                     existing_photos = self.db.get_figure_photos(self.current_figure_id)
+                    existing_photo_paths = {photo['file_path'] for photo in existing_photos}
                     
-                    # Delete existing photos from database and filesystem
+                    # Separate new photos from existing ones
+                    new_photo_paths = []
+                    kept_photo_paths = []
+                    
+                    for photo_path in dialog.photos:
+                        # Check if this is an existing collection photo (already in collection directory)
+                        if photo_path in existing_photo_paths:
+                            kept_photo_paths.append(photo_path)
+                        else:
+                            # This is a new photo that needs to be copied
+                            new_photo_paths.append(photo_path)
+                    
+                    # Delete photos that are no longer referenced
                     for photo in existing_photos:
-                        photo_path = photo['file_path']
-                        if os.path.exists(photo_path):
-                            try:
-                                os.remove(photo_path)
-                            except Exception:
-                                pass  # Continue even if file deletion fails
-                        self.db.delete_photo(photo['id'])
+                        if photo['file_path'] not in kept_photo_paths:
+                            photo_path = photo['file_path']
+                            if os.path.exists(photo_path):
+                                try:
+                                    os.remove(photo_path)
+                                except Exception:
+                                    pass  # Continue even if file deletion fails
+                            self.db.delete_photo(photo['id'])
                     
-                    # Add new photos if any were selected
-                    if dialog.photos:
-                        copied_paths = self.photo_manager.copy_photos_to_collection(dialog.photos, self.current_figure_id)
+                    # Copy new photos if any were added
+                    if new_photo_paths:
+                        copied_paths = self.photo_manager.copy_photos_to_collection(new_photo_paths, self.current_figure_id)
                         
+                        # Add new photos to database (after existing ones)
+                        next_index = len(kept_photo_paths)
                         for i, photo_path in enumerate(copied_paths):
-                            is_primary = i == 0  # First photo is primary
+                            is_primary = (next_index + i) == 0  # First photo is primary
                             self.db.add_photo(self.current_figure_id, photo_path, is_primary=is_primary)
                     
                     self.load_collection()
