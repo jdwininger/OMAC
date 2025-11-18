@@ -126,6 +126,17 @@ This creates both the application bundle and a compressed DMG file for distribut
 ./build_macos_app.sh
 ```
 
+### Cleanup Build Artifacts
+To remove all build artifacts and temporary directories created during the build process:
+```bash
+./cleanup_build_artifacts.sh
+```
+
+This script safely removes:
+- `build/` and `dist/` directories
+- `*.dmg` and `*.egg-info` files
+- Other build-related temporary files
+
 ### Distribution Files Created
 - **Application bundle**: `dist/OMAC.app` (~274MB) - The runnable application containing:
   - Python 3.8+ interpreter (bundled)
@@ -169,6 +180,18 @@ To create a standalone Linux AppImage that can be distributed to other users:
 4. **Creates AppImage structure** - Sets up AppDir with executable, libraries, desktop file, and icon
 5. **Generates icon** - Creates a simple PNG icon using Python PIL
 6. **Packages AppImage** - Uses appimagetool to create the final AppImage file
+
+### Cleanup Build Artifacts
+To remove all build artifacts and temporary directories created during the build process:
+```bash
+./cleanup_build_artifacts.sh
+```
+
+This script safely removes:
+- `build/` and `dist/` directories
+- `AppDir/` and `tools/` directories
+- `*.AppImage` and `*.spec` files
+- Other build-related temporary files
 
 ### Distribution Files Created
 - **AppImage**: `OMAC.AppImage` (~130MB) - Portable Linux application containing:
@@ -243,6 +266,7 @@ OMAC/
 ├── build_macos_app.sh         # Script to build macOS app bundle
 ├── build_and_package_macos.sh # Script to build app bundle + DMG
 ├── build_linux_appimage.sh    # Script to build Linux AppImage
+├── cleanup_build_artifacts.sh # Script to clean up build artifacts
 ├── README.md                  # This file
 ├── action_figures.db          # SQLite database (created on first run)
 ├── photos/                    # Photo storage directory (created automatically)
@@ -274,6 +298,10 @@ OMAC/
 **Build fails with "appimagetool not found"**
 - **Cause**: appimagetool download failed or network issue
 - **Solution**: Check internet connection, or manually download from https://github.com/AppImage/AppImageKit/releases
+
+**Need to restart a failed build**
+- **Cause**: Previous build artifacts interfering
+- **Solution**: Run `./cleanup_build_artifacts.sh` to remove all build artifacts, then retry the build
 
 ### macOS Build Issues
 
