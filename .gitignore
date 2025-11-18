@@ -36,6 +36,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 tests/
+tools/
 htmlcov/
 .tox/
 .nox/
@@ -209,6 +210,8 @@ Temporary Items
 .directory
 .Trash-*
 .nfs*
+squashfs-root/
+AppDir/
 
 # Project-specific: SQLite database files
 *.db
