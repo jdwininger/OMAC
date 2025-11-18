@@ -1,8 +1,6 @@
 #!/bin/bash
-"""
-Build script for creating a standalone Linux AppImage for OMAC.
-This script builds the app and packages it into a distributable AppImage file.
-"""
+# Build script for creating a standalone Linux AppImage for OMAC.
+# This script builds the app and packages it into a distributable AppImage file.
 
 set -e  # Exit on any error
 
@@ -90,8 +88,26 @@ Type=Application
 Categories=Utility;
 EOF
 
-# Copy icon (you'd need to create or provide an icon)
-# For now, we'll skip this as we don't have an icon file
+# Create a simple icon
+python3 -c "
+from PIL import Image, ImageDraw
+import os
+
+# Create a simple 256x256 icon
+img = Image.new('RGB', (256, 256), color='blue')
+draw = ImageDraw.Draw(img)
+
+# Draw a simple 'O' shape
+draw.ellipse([50, 50, 206, 206], fill='white', outline='black', width=5)
+draw.ellipse([80, 80, 176, 176], fill='blue')
+
+# Save as PNG
+img.save('AppDir/omac.png')
+print('Created omac.png icon')
+"
+
+# Copy desktop file to AppDir root (required by appimagetool)
+cp AppDir/usr/share/applications/omac.desktop AppDir/
 
 echo "Checking for appimagetool..."
 

@@ -48,14 +48,32 @@ A comprehensive desktop application for managing action figure collections with 
 
 ## Requirements
 
-- **Python 3.8 or higher**
+### Runtime Requirements
+- **Python 3.8 or higher** (only needed for development/running from source)
 - **PyQt6** - GUI framework
-- **Pillow** - Image processing for photos
-- **SQLite** - Database (included with Python)
-- **py2app** - For building standalone macOS applications (optional, only needed for macOS builds)
-- **PyInstaller** - For building standalone Linux AppImages (automatically downloaded during Linux builds)
+- **Pillow (PIL)** - Image processing for photos
+- **SQLite** - Database (included with Python 3.8+)
+
+### Build Requirements
+- **py2app** - For building standalone macOS applications
+- **PyInstaller** - For building standalone Linux AppImages/Windows executables
+- **squashfs-tools** - For creating Linux AppImages (system package)
+- **appimagetool** - For packaging Linux AppImages (downloaded automatically)
+
+### System Requirements
+- **macOS 10.15+** for macOS builds
+- **Linux with FUSE** for running Linux AppImages
+- **Internet connection** for automatic tool downloads during builds
 
 ## Installation
+
+### Quick Start (Recommended)
+For a quick setup with virtual environment, dependencies, and first run:
+```bash
+python quickstart.py
+```
+
+### Manual Installation
 
 1. **Clone or download the project**
    ```bash
@@ -109,7 +127,12 @@ This creates both the application bundle and a compressed DMG file for distribut
 ```
 
 ### Distribution Files Created
-- **Application bundle**: `dist/OMAC.app` (~274MB) - The runnable application
+- **Application bundle**: `dist/OMAC.app` (~274MB) - The runnable application containing:
+  - Python 3.8+ interpreter (bundled)
+  - PyQt6 GUI framework
+  - Pillow image processing
+  - SQLite database support
+  - All required system frameworks
 - **Distributable DMG**: `OMAC.dmg` (~113MB) - Compressed disk image for sharing
 
 ### Usage
@@ -129,32 +152,63 @@ This creates both the application bundle and a compressed DMG file for distribut
 To create a standalone Linux AppImage that can be distributed to other users:
 
 ### Prerequisites
-- Linux system (scripts include OS checks and will display an error on macOS/other systems)
-- Python virtual environment with dependencies installed
-- Internet connection (for automatic PyInstaller and appimagetool download)
+- **Linux system** (scripts include OS checks and will display an error on macOS/other systems)
+- **Python virtual environment** with dependencies installed (see Installation section)
+- **squashfs-tools package** installed on system (`sudo apt install squashfs-tools` on Ubuntu/Debian, `sudo dnf install squashfs-tools` on Fedora)
+- **Internet connection** (for automatic appimagetool download if not present)
 
-### Build AppImage
+### Build Process
 ```bash
 ./build_linux_appimage.sh
 ```
-This creates a standalone AppImage file for distribution. The script will automatically download and install PyInstaller and appimagetool if they're not already available on your system.
+
+**What the script does:**
+1. **Validates environment** - Checks for Linux OS, virtual environment, and required tools
+2. **Installs dependencies** - Ensures all Python packages are installed
+3. **Builds executable** - Uses PyInstaller to create a standalone executable with bundled Python 3.14
+4. **Creates AppImage structure** - Sets up AppDir with executable, libraries, desktop file, and icon
+5. **Generates icon** - Creates a simple PNG icon using Python PIL
+6. **Packages AppImage** - Uses appimagetool to create the final AppImage file
 
 ### Distribution Files Created
-- **AppImage**: `OMAC.AppImage` (~150MB) - Portable Linux application
-- **AppDir**: `AppDir/` - Application directory structure (if appimagetool not available)
+- **AppImage**: `OMAC.AppImage` (~130MB) - Portable Linux application containing:
+  - Python 3.14 interpreter (bundled)
+  - PyQt6 GUI libraries (60+ Qt6 libraries)
+  - Pillow image processing libraries
+  - SQLite database support
+  - All required system libraries
+  - Desktop integration files
 
 ### Usage
 - **Make executable**: `chmod +x OMAC.AppImage`
-- **Test locally**: `./OMAC.AppImage`
+- **Test locally**: `./OMAC.AppImage` (requires FUSE on target system)
 - **Distribute**: Share the `OMAC.AppImage` file with other Linux users
 
 **Notes:**
 - Scripts include OS detection and will exit with an error message if run on macOS
-- The script automatically downloads PyInstaller and appimagetool if not found (requires internet connection)
+- The script automatically downloads appimagetool if not found (requires internet connection)
 - The first run may take longer as it creates the database in `~/Documents/OMAC/`
 - The AppImage includes all necessary dependencies and is self-contained
 - Compatible with most Linux distributions (Ubuntu, Fedora, etc.)
-- No Python installation required on target systems
+- **No Python installation required** on target systems - everything is bundled
+- **FUSE required** on target systems to run the AppImage
+
+### AppImage Contents
+The Linux AppImage is completely self-contained and includes:
+- **Python 3.14 interpreter** (63MB executable with bundled interpreter)
+- **PyQt6 GUI framework** (60+ Qt6 libraries for complete GUI support)
+- **Pillow image libraries** (for photo processing and display)
+- **SQLite database support** (for data storage)
+- **System libraries** (ICU, FFmpeg, etc. for full compatibility)
+- **Desktop integration** (icon, desktop file for menu integration)
+- **Total size**: ~130MB compressed, ~241MB uncompressed when extracted
+
+### Running AppImages
+- **FUSE requirement**: Most Linux distributions have FUSE installed by default
+- **Permission**: Make executable with `chmod +x OMAC.AppImage`
+- **First run**: May take longer as it creates the database in `~/Documents/OMAC/`
+- **Integration**: AppImage integrates with system menus and file associations
+- **No installation**: Runs directly from any directory
 
 ## Usage
 
@@ -176,6 +230,8 @@ The application automatically detects your operating system and stores data in t
 OMAC/
 ├── main.py                    # Main application window and GUI
 ├── database.py                # SQLite database manager
+├── photo_manager.py           # Photo management utilities (refactored from main.py)
+├── collection_view.py         # Collection table view management (refactored from main.py)
 ├── merge_collections.py       # Collection merging functionality
 ├── wishlist_dialog.py         # Wishlist management dialog
 ├── quickstart.py              # Quick start utility
@@ -183,6 +239,7 @@ OMAC/
 ├── locations.txt              # Saved location list (created automatically)
 ├── requirements.txt           # Python dependencies
 ├── setup.py                   # Py2app configuration for macOS builds
+├── OMAC.spec                  # PyInstaller configuration (generated automatically)
 ├── build_macos_app.sh         # Script to build macOS app bundle
 ├── build_and_package_macos.sh # Script to build app bundle + DMG
 ├── build_linux_appimage.sh    # Script to build Linux AppImage
@@ -190,11 +247,53 @@ OMAC/
 ├── action_figures.db          # SQLite database (created on first run)
 ├── photos/                    # Photo storage directory (created automatically)
 ├── backups/                   # Backup storage directory (created automatically)
-├── build/                     # Build artifacts (created during macOS builds)
+├── build/                     # Build artifacts (created during builds)
+├── dist/                      # Distribution artifacts (created during builds)
 ├── tools/                     # Build tools directory (created automatically)
+├── AppDir/                    # AppImage structure (created during Linux builds)
 └── .github/
     └── copilot-instructions.md
 ```
+
+## Troubleshooting
+
+### Linux AppImage Issues
+
+**"dlopen(): error loading libfuse.so.2"**
+- **Cause**: FUSE (Filesystem in Userspace) is not installed
+- **Solution**: Install FUSE: `sudo apt install fuse` (Ubuntu/Debian) or `sudo dnf install fuse` (Fedora)
+
+**AppImage won't start after making executable**
+- **Cause**: Missing FUSE or incompatible system
+- **Solution**: Check FUSE installation and try extracting: `./OMAC.AppImage --appimage-extract`
+
+**Build fails with "mksquashfs command not found"**
+- **Cause**: squashfs-tools not installed
+- **Solution**: Install squashfs-tools: `sudo apt install squashfs-tools` (Ubuntu/Debian) or `sudo dnf install squashfs-tools` (Fedora)
+
+**Build fails with "appimagetool not found"**
+- **Cause**: appimagetool download failed or network issue
+- **Solution**: Check internet connection, or manually download from https://github.com/AppImage/AppImageKit/releases
+
+### macOS Build Issues
+
+**Build fails with "py2app not found"**
+- **Cause**: py2app not installed
+- **Solution**: Ensure virtual environment is activated and run `pip install -r requirements.txt`
+
+**App bundle won't open on target system**
+- **Cause**: macOS security settings blocking unsigned app
+- **Solution**: Right-click app → Open, or adjust Security & Privacy settings
+
+### General Issues
+
+**Application won't start - no error message**
+- **Cause**: Missing Qt platform plugins or display issues
+- **Solution**: Check that PyQt6 is properly installed and X11/Wayland display is available
+
+**Database errors on first run**
+- **Cause**: Permission issues with data directory
+- **Solution**: Check write permissions in home directory, or specify custom data directory
 
 ## User Guide
 
@@ -314,31 +413,6 @@ python main.py
 - **Cloud Backup**: Optional cloud storage integration
 - **Mobile Companion**: Web interface for mobile access
 - **Windows Portable App**: Standalone executable for Windows distribution
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Photo not displaying**: Check if image file still exists in photos directory
-2. **Database errors**: Ensure write permissions in application directory
-3. **Import errors**: Verify all dependencies are installed in virtual environment
-
-### Data Location
-
-OMAC automatically stores your data in platform-appropriate locations:
-
-- **macOS**: `~/Library/Application Support/OMAC/`
-- **Linux**: `~/Documents/OMAC/`
-- **Windows/Other**: Current application directory
-
-**Data includes:**
-- `action_figures.db` - SQLite database
-- `photos/` - Photo storage directory
-- `backups/` - Backup files directory
-- `manufacturers.txt` - Saved manufacturer preferences
-- `locations.txt` - Saved location preferences
-
-**Backup recommended**: Copy the entire data directory to preserve all your collection data.
 
 ## License
 
