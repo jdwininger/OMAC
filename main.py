@@ -14,6 +14,8 @@ import zipfile
 import tempfile
 import shutil
 import platform
+import socket
+import signal
 from datetime import datetime
 from typing import List, Dict, Optional
 from PyQt6.QtWidgets import (
@@ -25,7 +27,7 @@ from PyQt6.QtWidgets import (
     QListWidgetItem, QFrame, QStatusBar, QMenuBar, QMenu,
     QProgressDialog, QSizePolicy
 )
-from PyQt6.QtCore import Qt, QDate, QSize, pyqtSignal, QSettings
+from PyQt6.QtCore import Qt, QDate, QSize, pyqtSignal, QSettings, QTimer, QSocketNotifier
 from PyQt6.QtGui import (
     QAction, QFont, QPixmap, QIcon, QPainter, QPen, QBrush,
     QColor, QPalette
@@ -577,23 +579,26 @@ class OMACMainWindow(QMainWindow):
         self.sort_column = 'name'  # Default sort column
         self.sort_order = 'ASC'    # Default sort order
         
+        # Auto-save control
+        self.auto_save_enabled = False  # Start with auto-save disabled
+        
         self.init_ui()
         # Temporarily disconnect the resize signal to prevent saving during loading
-        self.collection_table.horizontalHeader().sectionResized.disconnect(self.save_column_widths)
+        # Note: Signal is connected in init_ui() table setup
         self.load_collection()
-        # Reconnect the signal
-        self.collection_table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         
-        # Load saved column settings (visibility, order, widths)
-        self.load_column_settings()
+        # Column settings will be loaded after window is shown in showEvent
         
-        # Load and apply saved theme
+        # Load saved theme preference
         self.load_theme_preference()
+        
+        # Auto-save will be enabled after geometry loading in showEvent
         
     def init_ui(self):
         """Initialize the user interface."""
         self.setWindowTitle("OMAC - One 'Mazing Action Catalog")
-        self.setGeometry(100, 100, 1200, 800)
+        # Note: Default geometry is now set in main() after window creation
+        # to allow saved geometry to be restored properly
         
         # Create menu bar
         self.create_menu_bar()
@@ -607,75 +612,86 @@ class OMACMainWindow(QMainWindow):
         self.update_status_bar()
         
     def load_column_widths(self):
-        """Load saved column width percentages from settings."""
+        """Load saved column widths from settings."""
         settings = QSettings("OMAC", "ActionFigureCatalog")
         
-        # Default column width percentages if no settings exist
-        default_percentages = [30.0, 20.0, 10.0, 15.0, 5.0, 10.0, 10.0]  # Name, Series, Wave, Manufacturer, Year, Condition, Photos
-        
-        # Load saved percentages
-        saved_percentages = []
-        has_saved_data = False
-        
+        # Load saved column widths
+        loaded_any = False
         for col in range(self.collection_table.columnCount()):
-            percentage_value = settings.value(f"column_percentage_{col}")
-            if percentage_value is not None:
+            width_value = settings.value(f"column_width_{col}")
+            if width_value is not None:
                 try:
-                    percentage = float(percentage_value)
-                    if 0 <= percentage <= 100:
-                        saved_percentages.append(percentage)
-                        has_saved_data = True
-                    else:
-                        saved_percentages.append(default_percentages[col] if col < len(default_percentages) else 10.0)
+                    width = int(width_value)
+                    if width > 0:
+                        self.collection_table.setColumnWidth(col, width)
+                        loaded_any = True
                 except (ValueError, TypeError):
-                    saved_percentages.append(default_percentages[col] if col < len(default_percentages) else 10.0)
-            else:
-                saved_percentages.append(default_percentages[col] if col < len(default_percentages) else 10.0)
+                    pass
         
-        # Apply the widths based on percentages if we have saved data
-        if has_saved_data and saved_percentages:
-            # Get available width for columns (table viewport width)
-            viewport_width = self.collection_table.viewport().width()
-            
-            # If viewport width is not yet available (during startup), use a reasonable default
-            if viewport_width <= 0:
-                viewport_width = 800  # Default table width
-            
-            # Calculate and set column widths based on percentages
-            for col, percentage in enumerate(saved_percentages):
-                width = int((percentage / 100.0) * viewport_width)
-                if width > 0:
-                    self.collection_table.setColumnWidth(col, width)
-        else:
-            # Fall back to default absolute widths
+        # If no saved widths were loaded, use defaults
+        if not loaded_any:
             default_widths = [250, 150, 120, 150, 80, 120, 100]
             for col in range(self.collection_table.columnCount()):
                 width = default_widths[col] if col < len(default_widths) else 100
                 self.collection_table.setColumnWidth(col, width)
         
         # Load window geometry
-        geometry = settings.value("window_geometry")
-        if geometry:
-            self.restoreGeometry(geometry)
+        # Note: Geometry is now loaded in main() before window.show()
+        # geometry = settings.value("window_geometry")
+        # if geometry:
+        #     print(f"Loading window geometry: {geometry}")  # Debug info
+        #     self.restoreGeometry(geometry)
+        # else:
+        #     print("No saved window geometry found")  # Debug info
         
         # Load window state (for splitter positions, etc.)
-        state = settings.value("window_state")
-        if state:
-            self.restoreState(state)
+        # Note: State is now loaded in main() before window.show()
+        # state = settings.value("window_state")
+        # if state:
+        #     print(f"Loading window state: {state}")  # Debug info
+        #     self.restoreState(state)
+        # else:
+        #     print("No saved window state found")  # Debug info
     
+    def apply_column_percentages(self):
+        """Apply saved column percentages to current table viewport width."""
+        if not hasattr(self, 'saved_column_percentages') or not self.saved_column_percentages:
+            return
+            
+        # Get available width for columns (table viewport width)
+        viewport_width = self.collection_table.viewport().width()
+        
+        # If viewport width is not available, skip
+        if viewport_width <= 0:
+            return
+        
+        # Temporarily disconnect the resize signal to prevent recursive saving
+        self.collection_table.horizontalHeader().sectionResized.disconnect(self.save_column_widths)
+        
+        # Calculate and set column widths based on percentages
+        for col, percentage in enumerate(self.saved_column_percentages):
+            if col < self.collection_table.columnCount():
+                width = int((percentage / 100.0) * viewport_width)
+                if width > 0:
+                    self.collection_table.setColumnWidth(col, width)
+        
     def save_column_widths(self):
-        """Save current column widths as percentages to settings."""
+        """Save current column widths as absolute values to settings."""
+        # Set flag to prevent dynamic resizing during manual column resize
+        self._manual_column_resize = True
+        
         settings = QSettings("OMAC", "ActionFigureCatalog")
         
-        # Calculate total width of all columns
-        total_width = sum(self.collection_table.columnWidth(col) for col in range(self.collection_table.columnCount()))
+        # Save absolute column widths
+        for col in range(self.collection_table.columnCount()):
+            width = self.collection_table.columnWidth(col)
+            settings.setValue(f"column_width_{col}", width)
         
-        if total_width > 0:
-            # Save column width percentages
-            for col in range(self.collection_table.columnCount()):
-                width = self.collection_table.columnWidth(col)
-                percentage = (width / total_width) * 100.0
-                settings.setValue(f"column_percentage_{col}", percentage)
+        # Force settings to be written to disk
+        settings.sync()
+        
+        # Clear flag after a short delay
+        QTimer.singleShot(100, lambda: setattr(self, '_manual_column_resize', False))
         
         # Save window geometry
         settings.setValue("window_geometry", self.saveGeometry())
@@ -691,39 +707,30 @@ class OMACMainWindow(QMainWindow):
             settings.setValue("menubar_visible", menubar.isVisible())
     
     def resizeEvent(self, event):
-        """Handle window resize events to maintain column proportions."""
+        """Handle window resize events."""
         super().resizeEvent(event)
         
-        # Only adjust columns if we have saved percentage data
-        settings = QSettings("OMAC", "ActionFigureCatalog")
-        has_percentage_data = any(settings.value(f"column_percentage_{col}") is not None 
-                                for col in range(self.collection_table.columnCount()))
+        # Save geometry when window is resized (only after initialization)
+        if hasattr(self, 'auto_save_enabled') and self.auto_save_enabled:
+            self.save_window_geometry_silent()
         
-        if has_percentage_data:
-            # Load saved percentages and recalculate widths
-            saved_percentages = []
-            for col in range(self.collection_table.columnCount()):
-                percentage_value = settings.value(f"column_percentage_{col}")
-                if percentage_value is not None:
-                    try:
-                        percentage = float(percentage_value)
-                        if 0 <= percentage <= 100:
-                            saved_percentages.append(percentage)
-                        else:
-                            saved_percentages.append(10.0)  # fallback
-                    except (ValueError, TypeError):
-                        saved_percentages.append(10.0)  # fallback
-                else:
-                    saved_percentages.append(10.0)  # fallback
-            
-            # Get available width for columns
-            viewport_width = self.collection_table.viewport().width()
-            if viewport_width > 0:
-                # Calculate and set column widths based on percentages
-                for col, percentage in enumerate(saved_percentages):
-                    width = int((percentage / 100.0) * viewport_width)
-                    if width > 0:
-                        self.collection_table.setColumnWidth(col, width)
+        # Note: Dynamic column resizing disabled to preserve manual column adjustments
+    
+    def moveEvent(self, event):
+        """Handle window move events."""
+        super().moveEvent(event)
+        # Save geometry when window is moved (only after initialization)
+        if hasattr(self, 'auto_save_enabled') and self.auto_save_enabled:
+            self.save_window_geometry_silent()
+    
+    def showEvent(self, event):
+        """Handle window show events - load geometry when window is first shown."""
+        super().showEvent(event)
+        # Load saved geometry when window is first shown
+        if not hasattr(self, '_geometry_loaded'):
+            self._geometry_loaded = True
+            # Use QTimer to ensure the event loop has processed the show
+            QTimer.singleShot(0, self.load_window_geometry_and_columns)
     
     def closeEvent(self, event):
         """Handle application close event."""
@@ -732,6 +739,16 @@ class OMACMainWindow(QMainWindow):
             self.save_column_widths()
             self.save_column_visibility()
             self.save_column_order()
+            
+            # Save window geometry and state directly
+            settings = QSettings("OMAC", "ActionFigureCatalog")
+            
+            # Save individual geometry components
+            settings.setValue("window_x", self.x())
+            settings.setValue("window_y", self.y())
+            settings.setValue("window_width", self.width())
+            settings.setValue("window_height", self.height())
+            settings.sync()  # Force immediate write to disk
 
             # Clean up any running threads or background processes
             # Note: Qt will automatically clean up child widgets and threads
@@ -743,6 +760,125 @@ class OMACMainWindow(QMainWindow):
             # Log the error but don't prevent closing
             print(f"Error during application shutdown: {e}")
             super().closeEvent(event)
+    
+    def save_window_geometry(self):
+        """Manually save current window geometry and state."""
+        try:
+            settings = QSettings("OMAC", "ActionFigureCatalog")
+            geometry = self.saveGeometry()
+            state = self.saveState()
+            
+            settings.setValue("window_geometry", geometry)
+            settings.setValue("window_state", state)
+            settings.sync()  # Force immediate write to disk
+            
+            # Show confirmation message
+            QMessageBox.information(
+                self,
+                "Window Position Saved",
+                "Current window position and size have been saved.\n"
+                "They will be restored the next time you start OMAC."
+            )
+            
+            print(f"Window geometry manually saved: {geometry}")
+            
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Save Failed",
+                f"Failed to save window position: {e}"
+            )
+            print(f"Error saving window geometry: {e}")
+    
+    def save_window_geometry_silent(self):
+        """Silently save current window geometry and state (no user notification)."""
+        if not self.auto_save_enabled:
+            return  # Skip auto-save during initialization
+            
+        try:
+            settings = QSettings("OMAC", "ActionFigureCatalog")
+            # Save individual geometry components
+            settings.setValue("window_x", self.x())
+            settings.setValue("window_y", self.y())
+            settings.setValue("window_width", self.width())
+            settings.setValue("window_height", self.height())
+            settings.sync()  # Force immediate write to disk
+            
+            # Also save horizontal scroll position as part of geometry
+            self.save_horizontal_scroll_position()
+            
+            print(f"Window geometry auto-saved: x={self.x()}, y={self.y()}, w={self.width()}, h={self.height()}")
+            
+        except Exception as e:
+            print(f"Error auto-saving window geometry: {e}")
+    
+    def load_window_geometry(self):
+        """Load and restore saved window geometry."""
+        try:
+            # Temporarily disable auto-save to prevent overwriting during loading
+            was_auto_save_enabled = getattr(self, 'auto_save_enabled', False)
+            self.auto_save_enabled = False
+            
+            settings = QSettings("OMAC", "ActionFigureCatalog")
+            # Try to load individual geometry components
+            x = settings.value("window_x")
+            y = settings.value("window_y")
+            width = settings.value("window_width")
+            height = settings.value("window_height")
+            
+            if x is not None and y is not None and width is not None and height is not None:
+                try:
+                    x, y, width, height = int(x), int(y), int(width), int(height)
+                    
+                    # Set the geometry directly
+                    self.setGeometry(x, y, width, height)
+                    
+                    # Ensure the window is visible on screen
+                    screen = QApplication.primaryScreen().availableGeometry()
+                    
+                    # Check if window is partially or fully off-screen or too small
+                    window_rect = self.geometry()
+                    if (window_rect.right() < screen.left() or 
+                        window_rect.bottom() < screen.top() or 
+                        window_rect.left() > screen.right() or 
+                        window_rect.top() > screen.bottom() or
+                        window_rect.width() < 400 or 
+                        window_rect.height() < 300):
+                        self.center_on_screen()
+                except (ValueError, TypeError) as e:
+                    print(f"Error parsing geometry values: {e}")
+                    self.center_on_screen()
+            else:
+                self.center_on_screen()
+                
+            # Re-enable auto-save
+            self.auto_save_enabled = True
+                
+        except Exception as e:
+            print(f"Error loading window geometry: {e}")
+            self.center_on_screen()
+            # Re-enable auto-save even on error
+            self.auto_save_enabled = was_auto_save_enabled
+    
+    def load_window_geometry_and_columns(self):
+        """Load window geometry and column settings after window is shown."""
+        # First load geometry
+        self.load_window_geometry()
+        
+        # Then reload column settings with correct table size
+        self.load_column_settings()
+    
+    def center_on_screen(self):
+        """Center the window on the primary screen with reasonable default size."""
+        screen = QApplication.primaryScreen().availableGeometry()
+        default_width = min(1200, screen.width() - 100)
+        default_height = min(800, screen.height() - 100)
+        
+        x = (screen.width() - default_width) // 2
+        y = (screen.height() - default_height) // 2
+        
+        self.setGeometry(x, y, default_width, default_height)
+        print(f"Centered window: x={x}, y={y}, w={default_width}, h={default_height}")
     
     def show_column_context_menu(self, position):
         """Show context menu for column management."""
@@ -822,6 +958,20 @@ class OMACMainWindow(QMainWindow):
         for logical_index in range(self.collection_table.columnCount()):
             visual_index = header.visualIndex(logical_index)
             settings.setValue(f"column_order_{logical_index}", visual_index)
+        settings.sync()
+    
+    def save_horizontal_scroll_position(self):
+        """Save horizontal scroll bar position."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        scroll_position = self.collection_table.horizontalScrollBar().value()
+        settings.setValue("horizontal_scroll_position", scroll_position)
+        settings.sync()
+    
+    def load_horizontal_scroll_position(self):
+        """Load horizontal scroll bar position."""
+        settings = QSettings("OMAC", "ActionFigureCatalog")
+        scroll_position = settings.value("horizontal_scroll_position", 0, type=int)
+        self.collection_table.horizontalScrollBar().setValue(scroll_position)
     
     def load_column_settings(self):
         """Load column visibility, order, and width settings."""
@@ -851,6 +1001,9 @@ class OMACMainWindow(QMainWindow):
         
         # Load column widths (existing functionality)
         self.load_column_widths()
+        
+        # Load horizontal scroll position
+        self.load_horizontal_scroll_position()
     
     # Duplicate load_column_widths definition removed to avoid conflicts; functionality is defined above.
     
@@ -946,6 +1099,13 @@ class OMACMainWindow(QMainWindow):
         dracula_theme_action = QAction('&Dracula Theme', self)
         dracula_theme_action.triggered.connect(self.switch_to_dracula_theme)
         theme_menu.addAction(dracula_theme_action)
+        
+        self.view_menu.addSeparator()
+        
+        save_geometry_action = QAction('&Save Window Position && Size', self)
+        save_geometry_action.setShortcut('Ctrl+S')
+        save_geometry_action.triggered.connect(self.save_window_geometry)
+        self.view_menu.addAction(save_geometry_action)
         
         # Help menu button
         self.help_menu_button = QPushButton("Help")
@@ -1126,6 +1286,8 @@ class OMACMainWindow(QMainWindow):
         self.collection_table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         # Connect to column move signal to save order
         self.collection_table.horizontalHeader().sectionMoved.connect(self.save_column_order)
+        # Connect to horizontal scroll bar to save position
+        self.collection_table.horizontalScrollBar().valueChanged.connect(self.save_horizontal_scroll_position)
         
         # Initialize collection view manager
         self.collection_view = CollectionView(self.collection_table, self.theme_manager)
@@ -1784,6 +1946,9 @@ To restore:
 def main():
     """Main function - entry point of the application."""
     try:
+        # Set up Unix signal handling for clean shutdown
+        setup_unix_signals()
+        
         # Create QApplication instance
         app = QApplication(sys.argv)
 
@@ -1797,6 +1962,7 @@ def main():
 
         # Create and show main window
         window = OMACMainWindow()
+        
         window.show()
 
         # Start event loop
@@ -1805,6 +1971,32 @@ def main():
     except Exception as e:
         print(f"Error starting application: {e}")
         sys.exit(1)
+
+
+def setup_unix_signals():
+    """Set up Unix signal handling for clean Qt application shutdown."""
+    # Create a socket pair for signal handling
+    read_socket, write_socket = socket.socketpair()
+    
+    def signal_handler(signum, frame):
+        """Handle Unix signals by writing to the socket."""
+        write_socket.send(b'1')
+    
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Create a QSocketNotifier to monitor the socket
+    notifier = QSocketNotifier(read_socket.fileno(), QSocketNotifier.Type.Read)
+    
+    def handle_signal():
+        """Handle the signal by closing the application."""
+        notifier.setEnabled(False)
+        read_socket.recv(1)  # Clear the socket
+        QApplication.quit()
+        notifier.setEnabled(True)
+    
+    notifier.activated.connect(handle_signal)
 
 
 def on_application_quit():

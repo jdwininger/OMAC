@@ -103,12 +103,13 @@ class DatabaseManager:
         
         cursor.execute('''
             INSERT INTO action_figures 
-            (name, series, manufacturer, year, scale, condition, purchase_price, 
+            (name, series, wave, manufacturer, year, scale, condition, purchase_price, 
              current_value, location, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             figure_data.get('name', ''),
             figure_data.get('series', ''),
+            figure_data.get('wave', ''),
             figure_data.get('manufacturer', ''),
             figure_data.get('year'),
             figure_data.get('scale', ''),
@@ -131,7 +132,7 @@ class DatabaseManager:
         
         cursor.execute('''
             UPDATE action_figures SET
-                name = ?, series = ?, manufacturer = ?, year = ?, scale = ?,
+                name = ?, series = ?, wave = ?, manufacturer = ?, year = ?, scale = ?,
                 condition = ?, purchase_price = ?, current_value = ?,
                 location = ?, notes = ?,
                 updated_at = CURRENT_TIMESTAMP
@@ -139,6 +140,7 @@ class DatabaseManager:
         ''', (
             figure_data.get('name', ''),
             figure_data.get('series', ''),
+            figure_data.get('wave', ''),
             figure_data.get('manufacturer', ''),
             figure_data.get('year'),
             figure_data.get('scale', ''),

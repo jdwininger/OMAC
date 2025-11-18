@@ -11,6 +11,8 @@ A comprehensive desktop application for managing action figure collections with 
 - **Advanced Search**: Find figures by name, series, or manufacturer
 - **Column Resizing**: Drag column borders to adjust column widths (widths are saved automatically)
 - **Alternating Row Colors**: Table displays alternating row colors that change with the theme
+- **Window Geometry Persistence**: Application remembers and restores window position and size between sessions
+- **Manual Window Save**: Save current window position and size manually via View → Save Window Position && Size
 - **Customizable Table View**: Show/hide columns and rearrange column order
 - **Dracula Theme** - Popular purple-tinted dark theme with improved contrast for menus and text
 - **Data Backup & Restore**: Create complete backups and restore from them
@@ -102,6 +104,29 @@ python quickstart.py
    ```bash
    python main.py
    ```
+
+### Using the Run Script (Recommended)
+
+For a more robust way to run the application with proper environment setup:
+
+```bash
+./run.sh
+```
+
+The `run.sh` script automatically:
+- Detects your platform (macOS, Linux, Windows)
+- Sets up all required environment variables
+- Activates the virtual environment
+- Checks for required dependencies
+- Creates necessary data directories
+- Launches the application with proper configuration
+
+**Benefits of using `run.sh`:**
+- Automatic platform detection and configuration
+- Environment variable setup for data directories
+- Dependency checking before launch
+- Consistent behavior across different systems
+- Proper virtual environment activation
 
 **First Run Notes:**
 - The application will create its data directory automatically based on your platform
@@ -235,12 +260,21 @@ The Linux AppImage is completely self-contained and includes:
 - **Integration**: AppImage integrates with system menus and file associations
 - **No installation**: Runs directly from any directory
 
-## Usage
+### Running the Application
 
-Run the application:
+Run the application using the launcher script:
 ```bash
-python main.py
+./run.sh
 ```
+
+**Important: Closing the Application**
+- **Use the GUI**: Always close the application by clicking the **X** button in the window title bar
+- **Avoid Ctrl+C**: Do not use Ctrl+C in the terminal, as it may prevent settings from being saved
+- **Geometry Persistence**: Window position and size are automatically saved when you close the application properly
+
+**Manual Save Option**:
+- Use `View → Save Window Position && Size` (or Ctrl+S) to save the current window position at any time
+- This is useful if you want to save a specific window layout without closing the application
 
 **Data Storage Locations:**
 - **macOS**: `~/Library/Application Support/OMAC/`
@@ -261,6 +295,7 @@ OMAC/
 ├── merge_collections.py       # Collection merging functionality
 ├── wishlist_dialog.py         # Wishlist management dialog
 ├── quickstart.py              # Quick start utility
+├── run.sh                     # Cross-platform launcher script with environment setup
 ├── manufacturers.txt          # Saved manufacturer list (created automatically)
 ├── locations.txt              # Saved location list (created automatically)
 ├── requirements.txt           # Python dependencies
@@ -357,6 +392,8 @@ OMAC/
 - **Column Reordering**: Drag column headers to rearrange column order
 - **Alternating Row Colors**: Table rows have alternating background colors that adapt to the current theme for better readability
 - **Theme**: Switch between light, dark, and Dracula themes via View → Theme menu
+- **Window Persistence**: Application automatically saves and restores window position and size when reopened
+- **Manual Window Save**: Save current window position and size immediately via View → Save Window Position && Size (Ctrl+S)
 
 ### Photo Features
 
