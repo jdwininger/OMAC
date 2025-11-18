@@ -221,6 +221,11 @@ AppDir/
 # Project-specific: Build artifacts and backups
 backups/
 backup/
+*.AppImage
+*.dmg
+tools/
+AppDir/
+squashfs-root/
 
 # Image files
 *.png
