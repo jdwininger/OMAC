@@ -32,6 +32,8 @@ from PyQt6.QtGui import (
 )
 from database import DatabaseManager
 from merge_collections import MergeCollectionsDialog
+from photo_manager import PhotoManager
+from collection_view import CollectionView
 
 
 class ImageViewerDialog(QDialog):
@@ -564,6 +566,7 @@ class OMACMainWindow(QMainWindow):
             db_path = 'action_figures.db'
         
         self.db = DatabaseManager(db_path)
+        self.photo_manager = PhotoManager(self.photos_dir)
         self.current_figure_id = None
         
         # Sorting state
@@ -1116,6 +1119,9 @@ class OMACMainWindow(QMainWindow):
         # Connect to column move signal to save order
         self.collection_table.horizontalHeader().sectionMoved.connect(self.save_column_order)
         
+        # Initialize collection view manager
+        self.collection_view = CollectionView(self.collection_table)
+        
         # Add sidebar and table to left layout
         left_layout.addWidget(sidebar_widget)
         left_layout.addWidget(self.collection_table)
@@ -1179,79 +1185,49 @@ class OMACMainWindow(QMainWindow):
         
     def load_collection(self):
         """Load the action figure collection into the table."""
-        figures = self.db.get_all_figures(self.sort_column, self.sort_order)
-        
-        self.collection_table.setRowCount(len(figures))
-        
-        for row, figure in enumerate(figures):
-            self.collection_table.setItem(row, 0, QTableWidgetItem(figure.get('name', '')))
-            self.collection_table.setItem(row, 1, QTableWidgetItem(figure.get('series', '')))
-            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('wave', '')))
-            self.collection_table.setItem(row, 3, QTableWidgetItem(figure.get('manufacturer', '')))
-            self.collection_table.setItem(row, 4, QTableWidgetItem(str(figure.get('year', ''))))
-            self.collection_table.setItem(row, 5, QTableWidgetItem(figure.get('condition', '')))
-            self.collection_table.setItem(row, 6, QTableWidgetItem(str(figure.get('photo_count', 0))))
-            
-            # Store figure ID in first column
-            self.collection_table.item(row, 0).setData(Qt.ItemDataRole.UserRole, figure['id'])
-        
-        self.collection_table.resizeColumnsToContents()
-        self.update_status_bar()
-        self.update_header_sort_indicator()
+        try:
+            figures = self.db.get_all_figures(self.collection_view.get_sort_column_name(), self.collection_view.sort_order)
+            self.collection_view.load_figures(figures)
+            self.update_status_bar()
+            self.update_header_sort_indicator()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to load collection: {str(e)}")
+            self.status_bar.showMessage("Failed to load collection", 5000)
         
     def search_collection(self, search_term: str):
         """Search the collection based on search term."""
-        if search_term.strip():
-            figures = self.db.search_figures(search_term, self.sort_column, self.sort_order)
-        else:
-            figures = self.db.get_all_figures(self.sort_column, self.sort_order)
-            
-        self.collection_table.setRowCount(len(figures))
-        
-        for row, figure in enumerate(figures):
-            self.collection_table.setItem(row, 0, QTableWidgetItem(figure.get('name', '')))
-            self.collection_table.setItem(row, 1, QTableWidgetItem(figure.get('series', '')))
-            self.collection_table.setItem(row, 2, QTableWidgetItem(figure.get('wave', '')))
-            self.collection_table.setItem(row, 3, QTableWidgetItem(figure.get('manufacturer', '')))
-            self.collection_table.setItem(row, 4, QTableWidgetItem(str(figure.get('year', ''))))
-            self.collection_table.setItem(row, 5, QTableWidgetItem(figure.get('condition', '')))
-            self.collection_table.setItem(row, 6, QTableWidgetItem(str(figure.get('photo_count', 0))))
-            
-            # Store figure ID in first column
-            self.collection_table.item(row, 0).setData(Qt.ItemDataRole.UserRole, figure['id'])
-        
-        self.collection_table.resizeColumnsToContents()
-        self.update_header_sort_indicator()
+        try:
+            if search_term.strip():
+                figures = self.db.search_figures(search_term, self.collection_view.get_sort_column_name(), self.collection_view.sort_order)
+            else:
+                figures = self.db.get_all_figures(self.collection_view.get_sort_column_name(), self.collection_view.sort_order)
+                
+            self.collection_view.load_figures(figures)
+            self.update_header_sort_indicator()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to search collection: {str(e)}")
+            self.status_bar.showMessage("Failed to search collection", 5000)
         
     def on_selection_changed(self):
         """Handle selection change in collection table."""
-        current_row = self.collection_table.currentRow()
-        if current_row >= 0:
-            item = self.collection_table.item(current_row, 0)
-            if item:
-                figure_id = item.data(Qt.ItemDataRole.UserRole)
-                self.show_figure_details(figure_id)
+        figure_id = self.collection_view.get_selected_figure_id()
+        if figure_id is not None:
+            self.show_figure_details(figure_id)
                 
     def on_header_clicked(self, logical_index: int):
         """Handle header click for sorting."""
-        # Map column index to column name
-        column_names = ['name', 'series', 'wave', 'manufacturer', 'year', 'condition', 'photos']
+        # Toggle sort order if same column clicked again
+        if self.collection_view.sort_column == logical_index:
+            self.collection_view.sort_order = 'DESC' if self.collection_view.sort_order == 'ASC' else 'ASC'
+        else:
+            self.collection_view.sort_column = logical_index
+            self.collection_view.sort_order = 'ASC'  # Default to ascending for new column
         
-        if logical_index < len(column_names):
-            column = column_names[logical_index]
-            
-            # Toggle sort order if same column clicked again
-            if self.sort_column == column:
-                self.sort_order = 'DESC' if self.sort_order == 'ASC' else 'ASC'
-            else:
-                self.sort_column = column
-                self.sort_order = 'ASC'  # Default to ascending for new column
-            
-            # Update header to show sort indicator
-            self.update_header_sort_indicator()
-            
-            # Reload collection with new sorting
-            self.load_collection()
+        # Update header to show sort indicator
+        self.update_header_sort_indicator()
+        
+        # Reload collection with new sorting
+        self.load_collection()
             
     def update_header_sort_indicator(self):
         """Update the header to show sort indicator for current sort column."""
@@ -1267,11 +1243,11 @@ class OMACMainWindow(QMainWindow):
                 header.model().setHeaderData(i, Qt.Orientation.Horizontal, clean_text, Qt.ItemDataRole.DisplayRole)
         
         # Add sort indicator to current sort column
-        if self.sort_column in column_names:
-            column_index = column_names.index(self.sort_column)
+        column_index = self.collection_view.sort_column
+        if 0 <= column_index < len(column_names):
             current_text = header.model().headerData(column_index, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
             if current_text:
-                indicator = ' ↑' if self.sort_order == 'ASC' else ' ↓'
+                indicator = ' ↑' if self.collection_view.sort_order == 'ASC' else ' ↓'
                 header.model().setHeaderData(column_index, Qt.Orientation.Horizontal, current_text + indicator, Qt.ItemDataRole.DisplayRole)
                 
     def show_figure_details(self, figure_id: int):
@@ -1348,114 +1324,107 @@ class OMACMainWindow(QMainWindow):
         
     def add_figure(self):
         """Add a new action figure."""
-        dialog = ActionFigureDialog(self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            form_data = dialog.get_form_data()
-            figure_id = self.db.add_figure(form_data)
-            
-            # Add photos if any were selected
-            if dialog.photos:
-                # Create photos directory if it doesn't exist
-                os.makedirs(self.photos_dir, exist_ok=True)
+        try:
+            dialog = ActionFigureDialog(self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                form_data = dialog.get_form_data()
+                figure_id = self.db.add_figure(form_data)
                 
-                for i, photo_path in enumerate(dialog.photos):
-                    # Copy photo to local directory
-                    filename = f"figure_{figure_id}_{i+1}_{os.path.basename(photo_path)}"
-                    new_path = os.path.join(self.photos_dir, filename)
+                # Add photos if any were selected
+                if dialog.photos:
+                    copied_paths = self.photo_manager.copy_photos_to_collection(dialog.photos, figure_id)
                     
-                    try:
-                        import shutil
-                        shutil.copy2(photo_path, new_path)
+                    for i, photo_path in enumerate(copied_paths):
                         is_primary = i == 0  # First photo is primary
-                        self.db.add_photo(figure_id, new_path, is_primary=is_primary)
-                    except Exception as e:
-                        QMessageBox.warning(self, "Photo Error", f"Could not save photo: {str(e)}")
-            
-            self.load_collection()
-            self.status_bar.showMessage("Figure added successfully", 3000)
+                        self.db.add_photo(figure_id, photo_path, is_primary=is_primary)
+                
+                self.load_collection()
+                self.status_bar.showMessage("Figure added successfully", 3000)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to add figure: {str(e)}")
+            self.status_bar.showMessage("Failed to add figure", 5000)
             
     def edit_figure(self):
         """Edit the selected action figure."""
-        if self.current_figure_id is None:
-            QMessageBox.warning(self, "No Selection", "Please select a figure to edit.")
-            return
-            
-        figure = self.db.get_figure(self.current_figure_id)
-        dialog = ActionFigureDialog(self, figure)
-        
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            form_data = dialog.get_form_data()
-            success = self.db.update_figure(self.current_figure_id, form_data)
-            
-            if success:
-                # Handle photos - delete existing photos and add new ones
-                # First, get existing photos
-                existing_photos = self.db.get_figure_photos(self.current_figure_id)
+        try:
+            if self.current_figure_id is None:
+                QMessageBox.warning(self, "No Selection", "Please select a figure to edit.")
+                return
                 
-                # Delete existing photos from database and filesystem
-                for photo in existing_photos:
-                    photo_path = photo['file_path']
-                    if os.path.exists(photo_path):
-                        try:
-                            os.remove(photo_path)
-                        except Exception:
-                            pass  # Continue even if file deletion fails
-                    self.db.delete_photo(photo['id'])
+            figure = self.db.get_figure(self.current_figure_id)
+            dialog = ActionFigureDialog(self, figure)
+            
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                form_data = dialog.get_form_data()
+                success = self.db.update_figure(self.current_figure_id, form_data)
                 
-                # Add new photos if any were selected
-                if dialog.photos:
-                    # Create photos directory if it doesn't exist
-                    os.makedirs(self.photos_dir, exist_ok=True)
+                if success:
+                    # Handle photos - delete existing photos and add new ones
+                    # First, get existing photos
+                    existing_photos = self.db.get_figure_photos(self.current_figure_id)
                     
-                    for i, photo_path in enumerate(dialog.photos):
-                        # Copy photo to local directory
-                        filename = f"figure_{self.current_figure_id}_{i+1}_{os.path.basename(photo_path)}"
-                        new_path = os.path.join(self.photos_dir, filename)
+                    # Delete existing photos from database and filesystem
+                    for photo in existing_photos:
+                        photo_path = photo['file_path']
+                        if os.path.exists(photo_path):
+                            try:
+                                os.remove(photo_path)
+                            except Exception:
+                                pass  # Continue even if file deletion fails
+                        self.db.delete_photo(photo['id'])
+                    
+                    # Add new photos if any were selected
+                    if dialog.photos:
+                        copied_paths = self.photo_manager.copy_photos_to_collection(dialog.photos, self.current_figure_id)
                         
-                        try:
-                            import shutil
-                            shutil.copy2(photo_path, new_path)
+                        for i, photo_path in enumerate(copied_paths):
                             is_primary = i == 0  # First photo is primary
-                            self.db.add_photo(self.current_figure_id, new_path, is_primary=is_primary)
-                        except Exception as e:
-                            QMessageBox.warning(self, "Photo Error", f"Could not save photo: {str(e)}")
-                
-                self.load_collection()
-                self.show_figure_details(self.current_figure_id)
-                self.status_bar.showMessage("Figure updated successfully", 3000)
-            else:
-                QMessageBox.warning(self, "Update Error", "Could not update figure.")
+                            self.db.add_photo(self.current_figure_id, photo_path, is_primary=is_primary)
+                    
+                    self.load_collection()
+                    self.show_figure_details(self.current_figure_id)
+                    self.status_bar.showMessage("Figure updated successfully", 3000)
+                else:
+                    QMessageBox.warning(self, "Update Error", "Could not update figure.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to edit figure: {str(e)}")
+            self.status_bar.showMessage("Failed to edit figure", 5000)
                 
     def delete_figure(self):
         """Delete the selected action figure."""
-        if self.current_figure_id is None:
-            QMessageBox.warning(self, "No Selection", "Please select a figure to delete.")
-            return
+        try:
+            if self.current_figure_id is None:
+                QMessageBox.warning(self, "No Selection", "Please select a figure to delete.")
+                return
+                
+            figure = self.db.get_figure(self.current_figure_id)
+            if not figure:
+                return
+                
+            reply = QMessageBox.question(
+                self,
+                "Delete Figure",
+                f"Are you sure you want to delete '{figure['name']}'?\n\nThis will also delete all associated photos.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
             
-        figure = self.db.get_figure(self.current_figure_id)
-        if not figure:
-            return
-            
-        reply = QMessageBox.question(
-            self,
-            "Delete Figure",
-            f"Are you sure you want to delete '{figure['name']}'?\n\nThis will also delete all associated photos.",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-        
-        if reply == QMessageBox.StandardButton.Yes:
-            success = self.db.delete_figure(self.current_figure_id)
-            if success:
-                self.current_figure_id = None
-                self.load_collection()
-                self.details_label.setText("Select a figure to view details")
-                # Clear photos
-                for i in reversed(range(self.photos_layout.count())):
-                    self.photos_layout.itemAt(i).widget().setParent(None)
-                self.status_bar.showMessage("Figure deleted successfully", 3000)
-            else:
-                QMessageBox.warning(self, "Delete Error", "Could not delete figure.")
+            if reply == QMessageBox.StandardButton.Yes:
+                success = self.db.delete_figure(self.current_figure_id)
+                if success:
+                    self.current_figure_id = None
+                    self.collection_view.clear_selection()
+                    self.load_collection()
+                    self.details_label.setText("Select a figure to view details")
+                    # Clear photos
+                    for i in reversed(range(self.photos_layout.count())):
+                        self.photos_layout.itemAt(i).widget().setParent(None)
+                    self.status_bar.showMessage("Figure deleted successfully", 3000)
+                else:
+                    QMessageBox.warning(self, "Delete Error", "Could not delete figure.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to delete figure: {str(e)}")
+            self.status_bar.showMessage("Failed to delete figure", 5000)
                 
     def open_wishlist(self):
         """Open the wishlist dialog."""
