@@ -22,7 +22,7 @@ from PyQt6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QTabWidget, QScrollArea,
     QFileDialog, QMessageBox, QDialog, QFormLayout, QSpinBox,
     QDoubleSpinBox, QDateEdit, QSplitter, QGroupBox, QListWidget,
-    QListWidgetItem, QFrame, QToolBar, QStatusBar, QMenuBar, QMenu,
+    QListWidgetItem, QFrame, QStatusBar, QMenuBar, QMenu,
     QProgressDialog, QSizePolicy
 )
 from PyQt6.QtCore import Qt, QDate, QSize, pyqtSignal, QSettings
@@ -591,9 +591,6 @@ class OMACMainWindow(QMainWindow):
         # Create menu bar
         self.create_menu_bar()
         
-        # Create toolbar
-        self.create_toolbar()
-        
         # Create central widget
         self.create_central_widget()
         
@@ -959,14 +956,6 @@ class OMACMainWindow(QMainWindow):
         
         self.menubar.setLayout(menubar_layout)
         self.menubar.show()  # Make sure it's visible
-        
-    def create_toolbar(self):
-        """Create the application toolbar."""
-        toolbar = QToolBar()
-        toolbar.setObjectName("main_toolbar")  # Set object name to avoid Qt warnings
-        self.addToolBar(toolbar)
-        
-        # Toolbar is now minimal - search moved to sidebar
         
     def create_central_widget(self):
         """Create the central widget with main content."""
