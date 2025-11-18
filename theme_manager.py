@@ -197,3 +197,25 @@ class ThemeManager:
                     color: #000000;
                 }
             """
+
+    def get_alternating_row_colors(self):
+        """Get alternating row colors for the current theme."""
+        if self.current_theme == self.DRACULA_THEME:
+            return {
+                'even_row': '#333449',  # Slightly darker than base for Dracula
+                'odd_row': '#2d2f41'    # Slightly lighter alternating
+            }
+        elif self.current_theme == self.DARK_THEME:
+            return {
+                'even_row': '#363636',  # Dark gray for even rows
+                'odd_row': '#404040'    # Slightly lighter for odd rows
+            }
+        else:  # Light theme
+            return {
+                'even_row': '#ffffff',  # White for even rows
+                'odd_row': '#f8f8f8'    # Light gray for odd rows
+            }
+
+    def is_dark_theme(self):
+        """Check if current theme is dark."""
+        return self.current_theme in [self.DARK_THEME, self.DRACULA_THEME]

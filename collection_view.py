@@ -4,6 +4,7 @@ Collection view management for OMAC.
 from typing import List, Dict, Optional
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
 
 
 class CollectionView:
@@ -11,11 +12,13 @@ class CollectionView:
     
     COLUMN_NAMES = ['name', 'series', 'wave', 'manufacturer', 'year', 'condition', 'photo_count']
     
-    def __init__(self, table_widget: QTableWidget):
+    def __init__(self, table_widget: QTableWidget, theme_manager=None):
         self.table = table_widget
+        self.theme_manager = theme_manager
         self.sort_column = 0  # Default to name column
         self.sort_order = "ASC"
         self.setup_table()
+        self.apply_alternating_row_colors()
     
     def setup_table(self):
         """Set up the table structure and headers."""
@@ -36,6 +39,26 @@ class CollectionView:
         header.resizeSection(4, 80)   # Year
         header.resizeSection(5, 120)  # Condition
         header.resizeSection(6, 80)   # Photos
+        
+        # Enable alternating row colors
+        self.table.setAlternatingRowColors(True)
+    
+    def apply_alternating_row_colors(self):
+        """Apply theme-aware alternating row colors."""
+        if self.theme_manager:
+            colors = self.theme_manager.get_alternating_row_colors()
+            
+            # Set the alternating row colors using stylesheet
+            self.table.setStyleSheet(f"""
+                QTableWidget {{
+                    alternate-background-color: {colors['odd_row']};
+                    background-color: {colors['even_row']};
+                }}
+            """)
+    
+    def update_theme(self):
+        """Update the table colors when theme changes."""
+        self.apply_alternating_row_colors()
     
     def load_figures(self, figures: List[Dict]) -> None:
         """

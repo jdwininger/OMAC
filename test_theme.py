@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel
 from theme_manager import ThemeManager
 
 class TestWindow(QMainWindow):
@@ -34,6 +34,11 @@ class TestWindow(QMainWindow):
         dracula_button = QPushButton("Dracula Theme")
         dracula_button.clicked.connect(self.set_dracula_theme)
         layout.addWidget(dracula_button)
+
+        # Add a test label to check text visibility
+        test_label = QLabel("Test Label - Check visibility")
+        test_label.setStyleSheet("font-weight: bold; margin: 10px;")
+        layout.addWidget(test_label)
 
         central_widget.setLayout(layout)
 

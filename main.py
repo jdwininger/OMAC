@@ -1128,7 +1128,7 @@ class OMACMainWindow(QMainWindow):
         self.collection_table.horizontalHeader().sectionMoved.connect(self.save_column_order)
         
         # Initialize collection view manager
-        self.collection_view = CollectionView(self.collection_table)
+        self.collection_view = CollectionView(self.collection_table, self.theme_manager)
         
         # Add sidebar and table to left layout
         left_layout.addWidget(sidebar_widget)
@@ -1751,9 +1751,11 @@ To restore:
         theme = settings.value("theme", ThemeManager.LIGHT_THEME)
         try:
             self.theme_manager.set_theme(theme)
+            self.collection_view.update_theme()
         except ValueError:
             # Fallback to light theme if invalid theme is saved
             self.theme_manager.set_theme(ThemeManager.LIGHT_THEME)
+            self.collection_view.update_theme()
 
     def save_theme_preference(self):
         """Save the current theme preference."""
@@ -1764,16 +1766,19 @@ To restore:
         """Switch to light theme."""
         self.theme_manager.set_theme(ThemeManager.LIGHT_THEME)
         self.save_theme_preference()
+        self.collection_view.update_theme()
 
     def switch_to_dark_theme(self):
         """Switch to dark theme."""
         self.theme_manager.set_theme(ThemeManager.DARK_THEME)
         self.save_theme_preference()
+        self.collection_view.update_theme()
 
     def switch_to_dracula_theme(self):
         """Switch to Dracula theme."""
         self.theme_manager.set_theme(ThemeManager.DRACULA_THEME)
         self.save_theme_preference()
+        self.collection_view.update_theme()
 
 
 def main():

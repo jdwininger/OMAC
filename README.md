@@ -9,9 +9,10 @@ A comprehensive desktop application for managing action figure collections with 
 - **Wishlist Management**: Track desired figures and easily move them to your collection when acquired
 - **Multi-Photo Support**: Upload and manage multiple photos per figure
 - **Advanced Search**: Find figures by name, series, or manufacturer
-- **Column Sorting**: Click any column header to sort ascending/descending (Name, Series, Wave, Manufacturer, Year, Condition, Photos)
+- **Column Resizing**: Drag column borders to adjust column widths (widths are saved automatically)
+- **Alternating Row Colors**: Table displays alternating row colors that change with the theme
 - **Customizable Table View**: Show/hide columns and rearrange column order
-- **Dark/Light Theme Support**: Switch between light, dark, and Dracula themes via View menu
+- **Dracula Theme** - Popular purple-tinted dark theme with improved contrast for menus and text
 - **Data Backup & Restore**: Create complete backups and restore from them
 - **Merge Collections**: Combine collections from other OMAC installations or CSV files
 - **Unique Menu Layout**: Traditional menu bar at the top with File, View, and Help menus
@@ -255,7 +256,7 @@ OMAC/
 ├── main.py                    # Main application window and GUI
 ├── database.py                # SQLite database manager
 ├── photo_manager.py           # Photo management utilities (refactored from main.py)
-├── collection_view.py         # Collection table view management (resizable columns)
+├── collection_view.py         # Collection table view management (resizable columns, alternating row colors)
 ├── theme_manager.py           # Theme management (light/dark/Dracula modes)
 ├── merge_collections.py       # Collection merging functionality
 ├── wishlist_dialog.py         # Wishlist management dialog
@@ -354,7 +355,7 @@ OMAC/
 - **Restore**: Restore from backup via File → Restore Database & Photos menu
 - **Column Management**: Right-click table headers to show/hide columns and reset layout
 - **Column Reordering**: Drag column headers to rearrange column order
-- **Column Resizing**: Drag column borders to adjust column widths (widths are saved automatically)
+- **Alternating Row Colors**: Table rows have alternating background colors that adapt to the current theme for better readability
 - **Theme**: Switch between light, dark, and Dracula themes via View → Theme menu
 
 ### Photo Features
