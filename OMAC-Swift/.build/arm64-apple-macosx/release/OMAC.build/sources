@@ -1,0 +1,17 @@
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift
+/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift

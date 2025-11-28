@@ -1,0 +1,1016 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.xctest/Contents/MacOS/OMACPackageTests",
+      "packagePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift",
+      "productName" : "OMACPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.OMAC-arm64-apple-macosx15.0-release.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/sources",
+      "importPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "OMAC",
+      "moduleOutputPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMAC.swiftmodule",
+      "objects" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swift.o",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-whole-module-optimization",
+        "-num-threads",
+        "14",
+        "-serialize-diagnostics",
+        "-O",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "OMAC_main",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "omac_swift"
+      ],
+      "outputFileMapPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMAC.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift"
+      ],
+      "tempsPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build",
+      "wholeModuleOptimization" : true
+    },
+    "C.OMACPackageTests-arm64-apple-macosx15.0-release.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/sources",
+      "importPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMACTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "OMACPackageTests",
+      "moduleOutputPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMACPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-whole-module-optimization",
+        "-num-threads",
+        "14",
+        "-serialize-diagnostics",
+        "-O",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/include/OMACPackageTests-Swift.h",
+        "-color-diagnostics",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "omac_swift"
+      ],
+      "outputFileMapPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMACPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build",
+      "wholeModuleOptimization" : true
+    },
+    "C.OMACTests-arm64-apple-macosx15.0-release.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/sources",
+      "importPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Tests/OMACTests/OMACTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "OMACTests",
+      "moduleOutputPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMACTests.swiftmodule",
+      "objects" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/OMACTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-whole-module-optimization",
+        "-num-threads",
+        "14",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/index/store",
+        "-O",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "omac_swift"
+      ],
+      "outputFileMapPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/OMACTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules/OMACTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/jeremy/Source/OMAC/OMAC-Swift/Tests/OMACTests/OMACTests.swift"
+      ],
+      "tempsPath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build",
+      "wholeModuleOptimization" : true
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "OMAC" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "OMAC",
+      "-package-name",
+      "omac_swift",
+      "-c",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift",
+      "-I",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-whole-module-optimization",
+      "-num-threads",
+      "14",
+      "-serialize-diagnostics",
+      "-O",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "OMAC_main",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "omac_swift",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "OMACPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "OMACPackageTests",
+      "-package-name",
+      "omac_swift",
+      "-c",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-whole-module-optimization",
+      "-num-threads",
+      "14",
+      "-serialize-diagnostics",
+      "-O",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/include/OMACPackageTests-Swift.h",
+      "-color-diagnostics",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "omac_swift",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "OMACTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "OMACTests",
+      "-package-name",
+      "omac_swift",
+      "-c",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/Tests/OMACTests/OMACTests.swift",
+      "-I",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-whole-module-optimization",
+      "-num-threads",
+      "14",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/index/store",
+      "-O",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "omac_swift",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "OMAC" : [
+
+    ],
+    "OMACPackageTests" : [
+      "OMACTests",
+      "OMAC"
+    ],
+    "OMACTests" : [
+      "OMAC"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/sources"
+    },
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.product/Objects.LinkFileList"
+    },
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/sources"
+    },
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/OMACTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/jeremy/Source/OMAC/OMAC-Swift/Tests/OMACTests/OMACTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACTests.build/sources"
+    },
+    "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

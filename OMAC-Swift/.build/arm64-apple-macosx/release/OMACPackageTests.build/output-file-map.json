@@ -1,0 +1,13 @@
+{
+  "": {
+    "dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/OMACPackageTests.d",
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/OMACPackageTests.o",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/master.swiftdeps"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.derived/runner.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/runner.dia"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "": {
+    "dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMAC.d",
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMAC.o",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/master.swiftdeps"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/ActionFigure.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ActionFigure.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/Photo.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/Photo.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Models/WishlistItem.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistItem.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/OMACApp.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/OMACApp.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/DataImportExport.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/DataImportExport.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PersistenceController.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PersistenceController.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Services/PhotoManager.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoManager.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/ViewModels/CollectionViewModel.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionViewModel.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditFigureView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditFigureView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/AddEditWishlistView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/AddEditWishlistView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/CollectionSidebar.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/CollectionSidebar.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ContentView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ContentView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/FigureDetailView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/FigureDetailView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/ImportExportView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/ImportExportView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoGalleryView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoGalleryView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/PhotoViewerView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/PhotoViewerView.dia"
+  },
+  "/Users/jeremy/Source/OMAC/OMAC-Swift/Sources/OMAC/Views/WishlistView.swift": {
+    "object": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swift.o",
+    "swiftmodule": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView~partial.swiftmodule",
+    "swift-dependencies": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.swiftdeps",
+    "diagnostics": "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMAC.build/WishlistView.dia"
+  }
+}

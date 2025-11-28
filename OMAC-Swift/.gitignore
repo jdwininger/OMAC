@@ -1,0 +1,37 @@
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcscmblueprint
+
+# Build artifacts
+build/
+DerivedData/
+
+# Swift Package Manager
+.swiftpm/
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/
+
+# macOS
+.DS_Store
+
+# SwiftLint
+.swiftlint.yml
+
+# Testing
+*.xctestplan
+
+# Playgrounds
+*.playground/
+
+# Archives
+*.xcarchive
+
+# Core Data
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

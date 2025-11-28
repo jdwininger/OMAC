@@ -1,4 +1,4 @@
-# OMAC - One 'Mazing ActionFigure Catalog
+# OMAC - One 'Mazing Action Catalog
 
 A comprehensive desktop application for managing action figure collections with photo support, built with Python and PyQt6.
 
@@ -325,7 +325,7 @@ python main.py
 
 ### Data Location
 
-OMAC automatically stores your data in platform-appropriate locations:
+One 'Mazing Action Catalog automatically stores your data in platform-appropriate locations:
 
 - **macOS**: `~/Library/Application Support/OMAC/`
 - **Linux**: `~/Documents/OMAC/`

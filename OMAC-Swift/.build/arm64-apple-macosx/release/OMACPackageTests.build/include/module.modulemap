@@ -1,0 +1,3 @@
+module OMACPackageTests {
+    header "/Users/jeremy/Source/OMAC/OMAC-Swift/.build/arm64-apple-macosx/release/OMACPackageTests.build/include/OMACPackageTests-Swift.h"
+}
