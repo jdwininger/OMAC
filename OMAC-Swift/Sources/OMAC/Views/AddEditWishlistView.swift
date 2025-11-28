@@ -25,86 +25,166 @@ struct AddEditWishlistView: View {
     @State private var priority = "medium"
     @State private var notes = ""
 
+    // Manufacturer management
+    @State private var manufacturers: [String] = []
+    @State private var showingAddManufacturer = false
+    @State private var newManufacturerName = ""
+
     private var isEditing: Bool { item != nil }
     private var title: String { isEditing ? "Edit Wishlist Item" : "Add to Wishlist" }
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Basic Information") {
-                    TextField("Name", text: $name)
-                        .textFieldStyle(.roundedBorder)
+        VStack(spacing: 20) {
+            // Title
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.primary)
 
-                    TextField("Series", text: $series)
-                        .textFieldStyle(.roundedBorder)
-
-                    TextField("Wave", text: $wave)
-                        .textFieldStyle(.roundedBorder)
-
-                    TextField("Manufacturer", text: $manufacturer)
-                        .textFieldStyle(.roundedBorder)
-                }
-
-                Section("Details") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Year")
-                            .font(.subheadline)
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Basic Information Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Basic Information")
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundColor(.secondary)
-                        TextField("Year", value: $year, format: .number)
-                            .textFieldStyle(.roundedBorder)
-                    }
+                            .textCase(.uppercase)
 
-                    TextField("Scale (e.g., 1/6, 1/12)", text: $scale)
-                        .textFieldStyle(.roundedBorder)
+                        VStack(spacing: 8) {
+                            TextField("Name", text: $name)
+                                .textFieldStyle(.roundedBorder)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Priority")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Picker("", selection: $priority) {
-                            Text("Low").tag("low")
-                            Text("Medium").tag("medium")
-                            Text("High").tag("high")
+                            TextField("Series", text: $series)
+                                .textFieldStyle(.roundedBorder)
+
+                            TextField("Wave", text: $wave)
+                                .textFieldStyle(.roundedBorder)
+
+                            HStack {
+                                Picker("Manufacturer", selection: $manufacturer) {
+                                    Text("Select manufacturer").tag("")
+                                    ForEach(manufacturers, id: \.self) { manufacturerName in
+                                        Text(manufacturerName).tag(manufacturerName)
+                                    }
+                                }
+                                Button(action: { showingAddManufacturer = true }) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.blue)
+                                        .frame(width: 24, height: 24)
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                            }
                         }
-                        .pickerStyle(.segmented)
                     }
-                }
 
-                Section("Pricing") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Target Price")
-                            .font(.subheadline)
+                    // Details Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Details")
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundColor(.secondary)
-                        TextField("Target Price", value: $targetPrice, format: .currency(code: "USD"))
-                            .textFieldStyle(.roundedBorder)
+                            .textCase(.uppercase)
+
+                        VStack(spacing: 8) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Year")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                TextField("Year", value: $year, format: .number.grouping(.never))
+                                    .textFieldStyle(.roundedBorder)
+                            }
+
+                            TextField("Scale (e.g., 1/6, 1/12)", text: $scale)
+                                .textFieldStyle(.roundedBorder)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Priority")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Picker("", selection: $priority) {
+                                    Text("Low").tag("low")
+                                    Text("Medium").tag("medium")
+                                    Text("High").tag("high")
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                        }
+                    }
+
+                    // Pricing Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Pricing")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.secondary)
+                            .textCase(.uppercase)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Target Price")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            TextField("Target Price", value: $targetPrice, format: .currency(code: "USD"))
+                                .textFieldStyle(.roundedBorder)
+                        }
+                    }
+
+                    // Notes Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Notes")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.secondary)
+                            .textCase(.uppercase)
+
+                        TextEditor(text: $notes)
+                            .frame(minHeight: 100)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                     }
                 }
-
-                Section("Notes") {
-                    TextEditor(text: $notes)
-                        .frame(minHeight: 100)
-                }
+                .padding(.horizontal)
             }
-            .navigationTitle(title)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
 
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(isEditing ? "Update" : "Add") {
-                        saveItem()
-                    }
-                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+            // Buttons
+            HStack(spacing: 12) {
+                Spacer()
+                Button("Cancel") {
+                    dismiss()
                 }
+                .keyboardShortcut(.cancelAction)
+                Button(isEditing ? "Update" : "Add") {
+                    saveItem()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
-        .frame(minWidth: 400, minHeight: 600)
+        .padding(20)
+        .frame(width: 500, height: 600)
+        .background(Color(NSColor.windowBackgroundColor))
         .onAppear {
             loadItemData()
-            viewModel.setModelContext(modelContext)
+            loadUserPreferences()
+        }
+        .sheet(isPresented: $showingAddManufacturer) {
+            AddItemSheet(
+                title: "Add Manufacturer",
+                placeholder: "Manufacturer name",
+                text: $newManufacturerName,
+                onSave: {
+                    if !newManufacturerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        UserPreferences.shared.addManufacturer(newManufacturerName)
+                        manufacturers = UserPreferences.shared.getManufacturers()
+                        manufacturer = newManufacturerName
+                        newManufacturerName = ""
+                    }
+                    showingAddManufacturer = false
+                },
+                onCancel: {
+                    newManufacturerName = ""
+                    showingAddManufacturer = false
+                }
+            )
         }
     }
 
@@ -120,6 +200,10 @@ struct AddEditWishlistView: View {
             priority = item.priority
             notes = item.notes ?? ""
         }
+    }
+
+    private func loadUserPreferences() {
+        manufacturers = UserPreferences.shared.getManufacturers()
     }
 
     private func saveItem() {

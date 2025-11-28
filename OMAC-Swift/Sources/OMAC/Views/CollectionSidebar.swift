@@ -60,9 +60,14 @@ struct CollectionSidebar: View {
 
             // Collection list
             List(selection: $selectedFigure) {
-                ForEach(viewModel.filteredFigures, id: \.id) { figure in
+                ForEach(Array(viewModel.filteredFigures.enumerated()), id: \.element.id) { index, figure in
                     FigureRowView(figure: figure)
                         .tag(figure)
+                        .listRowBackground(
+                            index % 2 == 0 ?
+                                Color(.controlBackgroundColor).opacity(0.2) :
+                                Color(.controlBackgroundColor).opacity(0.05)
+                        )
                 }
             }
             .listStyle(.sidebar)
@@ -93,6 +98,12 @@ struct CollectionSidebar: View {
         }
         .sheet(isPresented: $showingAddFigure) {
             AddEditFigureView(figure: nil)
+        }
+        .onChange(of: showingAddFigure) { oldValue, newValue in
+            if !newValue && oldValue {
+                // Sheet was dismissed, refresh the data
+                viewModel.loadFigures()
+            }
         }
         .onAppear {
             viewModel.setModelContext(modelContext)

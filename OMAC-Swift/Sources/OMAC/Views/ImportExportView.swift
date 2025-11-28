@@ -40,7 +40,7 @@ struct ImportExportView: View {
             }
             .fileImporter(
                 isPresented: $showingImportPicker,
-                allowedContentTypes: [UTType.commaSeparatedText],
+                allowedContentTypes: [UTType.zip],
                 allowsMultipleSelection: false
             ) { result in
                 handleImportResult(result)
@@ -95,15 +95,12 @@ struct ImportExportView: View {
             }) {
                 Label("Import from CSV", systemImage: "square.and.arrow.down")
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
             }
+            .buttonStyle(.borderedProminent)
             .disabled(importExport.isImporting)
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
+        .background(Color(.controlBackgroundColor).opacity(0.5))
         .cornerRadius(12)
     }
 
@@ -131,14 +128,11 @@ struct ImportExportView: View {
             }) {
                 Label("Export to CSV", systemImage: "square.and.arrow.up")
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
             }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
+        .background(Color(.controlBackgroundColor).opacity(0.5))
         .cornerRadius(12)
     }
 
@@ -148,7 +142,7 @@ struct ImportExportView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
 
-            Text("Create backups of your collection or restore from a previous backup.")
+            Text("Create backups of your collection (including photos) or restore from a previous backup.")
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .font(.subheadline)
@@ -167,25 +161,19 @@ struct ImportExportView: View {
                     }
                 }) {
                     Label("Create Backup", systemImage: "archivebox")
-                        .padding()
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
                 }
+                .buttonStyle(.borderedProminent)
 
                 Button(action: {
                     showingImportPicker = true
                 }) {
                     Label("Restore Backup", systemImage: "arrow.clockwise")
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
                 }
+                .buttonStyle(.bordered)
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
+        .background(Color(.controlBackgroundColor).opacity(0.5))
         .cornerRadius(12)
     }
 

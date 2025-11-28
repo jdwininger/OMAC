@@ -290,6 +290,12 @@ class DataImportExport: ObservableObject {
         // Export to CSV
         let csvURL = try await exportToCSV(modelContext: modelContext)
 
+        // Export user preferences
+        let preferences = UserPreferences.shared.exportPreferences()
+        let preferencesData = try JSONSerialization.data(withJSONObject: preferences, options: .prettyPrinted)
+        let preferencesURL = csvURL.deletingLastPathComponent().appendingPathComponent("user_preferences.json")
+        try preferencesData.write(to: preferencesURL)
+
         // Create backup directory
         let fileManager = FileManager.default
         let appSupport = try fileManager.url(for: .applicationSupportDirectory,
@@ -302,21 +308,87 @@ class DataImportExport: ObservableObject {
 
         // Create backup filename with timestamp
         let timestamp = dateFormatter.string(from: Date()).replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: ":", with: "-")
-        let backupFilename = "omac_backup_\(timestamp).csv"
+        let backupFilename = "omac_backup_\(timestamp).zip"
         let backupURL = backupsDir.appendingPathComponent(backupFilename)
 
-        // Copy CSV to backup location
-        try fileManager.copyItem(at: csvURL, to: backupURL)
+        // Create zip file containing CSV, preferences, and photos
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/zip")
+        process.arguments = ["-r", backupURL.path, csvURL.lastPathComponent, "user_preferences.json", "photos"]
+        process.currentDirectoryURL = omacDir
+
+        try process.run()
+        process.waitUntilExit()
+
+        if process.terminationStatus != 0 {
+            throw ExportError.writeFailed
+        }
+
+        // Clean up temporary files
+        try? fileManager.removeItem(at: csvURL)
+        try? fileManager.removeItem(at: preferencesURL)
 
         return backupURL
     }
 
     func restoreFromBackup(url: URL, modelContext: ModelContext) async throws {
+        let fileManager = FileManager.default
+
+        // Create temporary directory for extraction
+        let tempDir = fileManager.temporaryDirectory.appendingPathComponent("omac_restore_\(UUID().uuidString)")
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer {
+            try? fileManager.removeItem(at: tempDir)
+        }
+
+        // Extract zip file
+        let unzipProcess = Process()
+        unzipProcess.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
+        unzipProcess.arguments = ["-q", url.path, "-d", tempDir.path]
+        try unzipProcess.run()
+        unzipProcess.waitUntilExit()
+
+        if unzipProcess.terminationStatus != 0 {
+            throw ImportError.parsingFailed("Failed to extract backup file")
+        }
+
+        // Find the CSV file in the extracted contents
+        let contents = try fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
+        guard let csvURL = contents.first(where: { $0.pathExtension == "csv" }) else {
+            throw ImportError.fileNotFound
+        }
+
         // Clear existing data first
         try clearAllData(modelContext: modelContext)
 
-        // Import from backup
-        try await importFromCSV(url: url, modelContext: modelContext)
+        // Import from CSV
+        try await importFromCSV(url: csvURL, modelContext: modelContext)
+
+        // Restore user preferences if preferences file exists in backup
+        let preferencesURL = tempDir.appendingPathComponent("user_preferences.json")
+        if fileManager.fileExists(atPath: preferencesURL.path) {
+            let preferencesData = try Data(contentsOf: preferencesURL)
+            if let preferences = try JSONSerialization.jsonObject(with: preferencesData, options: []) as? [String: [String]] {
+                UserPreferences.shared.importPreferences(preferences)
+            }
+        }
+
+        // Restore photos if photos directory exists in backup
+        let photosDirInBackup = tempDir.appendingPathComponent("photos")
+        if fileManager.fileExists(atPath: photosDirInBackup.path) {
+            let appSupport = try fileManager.url(for: .applicationSupportDirectory,
+                                               in: .userDomainMask,
+                                               appropriateFor: nil,
+                                               create: true)
+            let omacDir = appSupport.appendingPathComponent("OMAC")
+            let photosDir = omacDir.appendingPathComponent("photos")
+
+            // Remove existing photos directory if it exists
+            try? fileManager.removeItem(at: photosDir)
+
+            // Copy restored photos
+            try fileManager.copyItem(at: photosDirInBackup, to: photosDir)
+        }
     }
 
     private func clearAllData(modelContext: ModelContext) throws {
